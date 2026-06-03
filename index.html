@@ -30,6 +30,7 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;font-weight:500;}
 .ok{background:rgba(47,93,58,.14);color:var(--green);} .caution{background:rgba(154,123,51,.18);color:var(--gold);} .sample{background:rgba(90,82,72,.12);color:var(--ink-soft);}
 .hl{font-family:'Fraunces',serif;font-weight:500;font-size:22px;line-height:1.2;margin:0 0 8px;}
+.hl a{color:inherit;text-decoration:none;} .hl a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--green);}
 .sum{font-size:16px;margin:0 0 12px;} .basis,.caveat{font-size:14px;margin:0 0 10px;}
 .lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);font-weight:500;margin-bottom:2px;} .lbl-c{color:var(--clay);}
 .caveat{color:var(--ink-soft);font-style:italic;border-left:2px solid var(--clay);padding-left:11px;}
@@ -72,6 +73,13 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
   .gate-row input,.subrow input{flex:1 1 100%;}
   .gate-row button,.subrow button{flex:1 1 100%;}
 }
+.site{max-width:760px;margin:48px auto 0;border-top:2px solid var(--ink);padding-top:24px;text-align:center;}
+.site-sub p{font-family:'Fraunces',serif;font-size:18px;color:var(--ink);margin:0 0 12px;}
+.site-sub .subrow{max-width:440px;margin:0 auto;}
+.site-links{margin-top:22px;font-size:13px;color:var(--ink-soft);}
+.site-links a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);} .site-links a:hover{color:var(--ink);}
+.site-links .sep{margin:0 9px;color:var(--line);}
+.ver{color:var(--ink-soft);opacity:.65;}
 .hidden{display:none;}
 </style>
 </head>
@@ -86,7 +94,7 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
     <div class="gate-msg" id="gateMsg"></div>
     <button id="notifyBtn" class="hidden gate-notify">Notify me when it opens</button>
   </div>
-  <div class="sitefoot"><a href="privacy.html">Privacy</a> &middot; <a href="tos.html">Terms</a> &middot; <a href="contact.html">Contact</a></div>
+  <div class="sitefoot"><a href="privacy.html">Privacy</a> &middot; <a href="tos.html">Terms</a> &middot; <a href="contact.html">Contact</a> &middot; <span class="ver" id="verGate"></span></div>
 </div>
 
 <div class="wrap hidden" id="app">
@@ -100,12 +108,14 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
   <div class="filters" id="filters"></div>
   <div id="content"><div class="loading"><div class="spin"></div><p>Loading the latest\u2026</p></div></div>
   <p class="note" id="note"></p>
-  <div class="subscribe" id="subBox">
-    <p>Like it? Get the good news in your inbox.</p>
-    <div class="subrow"><input id="subEmail" type="email" placeholder="you@example.com" autocomplete="email"/><button id="subBtn">Subscribe</button></div>
-    <div class="submsg" id="subMsg"></div>
-  </div>
-  <div class="sitefoot"><a href="privacy.html">Privacy</a> &middot; <a href="tos.html">Terms</a> &middot; <a href="contact.html">Contact</a></div>
+  <footer class="site">
+    <div class="site-sub">
+      <p>Like it? Get the good news in your inbox.</p>
+      <div class="subrow"><input id="subEmail" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email"/><button id="subBtn">Subscribe</button></div>
+      <div class="submsg" id="subMsg"></div>
+    </div>
+    <div class="site-links"><a href="privacy.html">Privacy</a><span class="sep">&middot;</span><a href="tos.html">Terms</a><span class="sep">&middot;</span><a href="contact.html">Contact</a><span class="sep">&middot;</span><span class="ver" id="ver"></span></div>
+  </footer>
 </div>
 
 <script>
@@ -125,6 +135,26 @@ let ALL=[], ACTIVE="All", IS_SAMPLE=false, LAST_EMAIL="";
 function sigCls(s=""){s=s.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"s-strong";if(s.includes("notable"))return"s-mid";return"s-soft";}
 function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";if(s.includes("moderate"))return"d-mid";return"d-soft";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+const VERSION="v0.4.0", BUILD="2026-06-03";
+function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
+const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
+const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
+function hlToken(t,i){
+  const bare=t.replace(/[^A-Za-z0-9]/g,"");
+  if(!bare) return t;
+  const isAcr=HL_ACR.has(bare.toUpperCase())||(bare.length<=4&&/^[A-Za-z]+$/.test(bare)&&!/[AEIOU]/i.test(bare));
+  if(isAcr) return t.toUpperCase();
+  const low=t.toLowerCase();
+  if(i>0&&HL_SMALL.has(low.replace(/[^a-z]/g,""))) return low;
+  return low.replace(/[a-z]/,ch=>ch.toUpperCase());
+}
+function niceHeadline(h,src){
+  let s=String(h||"").trim();
+  s=s.replace(/\s*\|\s*[^|]{1,40}$/,"");
+  if(src){const e2=String(src).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");s=s.replace(new RegExp("\\s*[\\u2013\\u2014-]\\s*"+e2+"\\s*$","i"),"");}
+  if(/[A-Z]/.test(s)&&!/[a-z]/.test(s)){s=s.split(/\s+/).map((t,i)=>hlToken(t,i)).join(" ");}
+  return s.trim();
+}
 
 function renderFilters(){
   const f=document.getElementById("filters");
@@ -140,13 +170,16 @@ function renderCards(){
   c.innerHTML='<div class="grid">'+items.map(s=>{
     const verified=(s.verification||"").toLowerCase().includes("verif");
     const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?'<span class="badge ok">\u2713 Verified</span>':'<span class="badge caution">\u25B3 Caution</span>');
+    const dh=niceHeadline(s.headline,s.source_name);
+    const hasLink=s.source_url&&s.source_url!=="#";
+    const hl=hasLink?`<a href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(dh)}</a>`:esc(dh);
     return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span>${badge}</div>
-      <h2 class="hl">${esc(s.headline)}</h2>
-      ${s.basis?`<p class="basis"><span class="lbl">Basis</span>${esc(s.basis)}</p>`:""}
+      <h2 class="hl">${hl}</h2>
+      ${s.basis?`<p class="basis"><span class="lbl">What backs it</span>${esc(s.basis)}</p>`:""}
       ${s.caveat?`<p class="caveat"><span class="lbl lbl-c">What it doesn't mean</span>${esc(s.caveat)}</p>`:""}
       <div class="meta"><span class="sig ${sigCls(s.significance)}">${esc(s.significance)}</span><span class="conf"><span class="dot ${confCls(s.confidence)}"></span>${esc(s.confidence)}</span></div>
       ${s.check_note?`<p style="font-size:12px;color:var(--ink-soft);margin:0 0 4px;">Checked &mdash; ${esc(s.check_note)}</p>`:""}
-      <div class="foot"><button class="share-btn" data-h="${esc(s.headline)}" data-u="${esc(s.source_url||"")}">Share</button>${s.source_url&&s.source_url!=="#"?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>';
+      <div class="foot"><button class="share-btn" data-h="${esc(dh)}" data-u="${esc(s.source_url||"")}">Share</button>${hasLink?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>';
 }
 function render(items,isSample){ALL=items;IS_SAMPLE=isSample;ACTIVE="All";renderFilters();renderCards();}
 function showApp(){document.getElementById("gate").classList.add("hidden");document.getElementById("app").classList.remove("hidden");wireSubscribe();}
@@ -244,7 +277,7 @@ document.addEventListener("click",(e)=>{
   if(!e.target.closest(".share-menu")) closeShareMenus();
 });
 
-(function init(){ const saved=localStorage.getItem("lobs_email"); if(saved){ showApp(); loadFeed(); } })();
+(function init(){ setVersion(); const saved=localStorage.getItem("lobs_email"); if(saved){ showApp(); loadFeed(); } })();
 </script>
 </body>
 </html>
