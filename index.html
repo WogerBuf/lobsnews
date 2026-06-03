@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
 :root{--paper:#F6F2E9;--paper-2:#EFEADD;--ink:#221E18;--ink-soft:#5A5248;--line:#D8CFBC;--green:#2F5D3A;--clay:#8A4B33;--gold:#9A7B33;}
 *{box-sizing:border-box;}
-body{margin:0;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.5;background:radial-gradient(120% 80% at 80% -10%,#FBF8F1 0%,rgba(251,248,241,0) 60%),var(--paper);min-height:100vh;padding:34px 22px 48px;}
+body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.5;background:radial-gradient(120% 80% at 80% -10%,#FBF8F1 0%,rgba(251,248,241,0) 60%),var(--paper);min-height:100vh;padding:34px 22px 48px;}
 .wrap{max-width:1080px;margin:0 auto;}
 .wordmark{display:flex;align-items:baseline;gap:10px;}
 .mark{font-family:'Fraunces',serif;font-weight:600;font-size:42px;letter-spacing:-.5px;}
@@ -63,6 +63,14 @@ body{margin:0;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-heigh
 .gate-row button{font-family:'Newsreader',serif;font-size:16px;padding:10px 18px;border:1px solid var(--green);background:var(--green);color:var(--paper);border-radius:4px;cursor:pointer;} .gate-row button:hover{background:#264c30;}
 .gate-msg{margin-top:12px;font-size:14px;min-height:20px;} .gate-err{color:var(--clay);} .gate-ok{color:var(--green);}
 .gate-notify{margin-top:14px;font-family:'Newsreader',serif;font-size:15px;padding:8px 16px;border:1px solid var(--green);background:transparent;color:var(--green);border-radius:4px;cursor:pointer;} .gate-notify:hover{background:var(--green);color:var(--paper);}
+.gate-row input,.subrow input{min-width:0;}
+.gate-row button,.subrow button{flex-shrink:0;white-space:nowrap;}
+@media (max-width:520px){
+  body{padding-left:16px;padding-right:16px;}
+  .gate-row,.subrow{flex-wrap:wrap;}
+  .gate-row input,.subrow input{flex:1 1 100%;}
+  .gate-row button,.subrow button{flex:1 1 100%;}
+}
 .hidden{display:none;}
 </style>
 </head>
