@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Contact — Lobs News</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
+body{margin:0;font-family:'Newsreader',Georgia,serif;color:#221E18;line-height:1.6;background:#F6F2E9;padding:40px 22px 60px;}
+.wrap{max-width:600px;margin:0 auto;}
+a.home{text-decoration:none;color:#2F5D3A;font-size:14px;}
+.mark{font-family:'Fraunces',serif;font-weight:600;font-size:26px;} .mark2{color:#2F5D3A;}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin:16px 0 2px;}
+p{font-size:16px;} .muted{color:#5A5248;font-size:14px;}
+label{display:block;font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:#5A5248;margin:18px 0 6px;}
+input,textarea{width:100%;font-family:'Newsreader',serif;font-size:16px;padding:11px 12px;border:1px solid #D8CFBC;border-radius:4px;background:#FFFDF8;color:#221E18;box-sizing:border-box;}
+input:focus,textarea:focus{outline:none;border-color:#2F5D3A;}
+textarea{min-height:150px;resize:vertical;}
+button{margin-top:18px;font-family:'Newsreader',serif;font-size:16px;padding:11px 22px;border:1px solid #2F5D3A;background:#2F5D3A;color:#F6F2E9;border-radius:4px;cursor:pointer;}
+button:hover{background:#264c30;} button:disabled{opacity:.6;cursor:default;}
+.msg{margin-top:14px;font-size:15px;min-height:20px;} .ok{color:#2F5D3A;} .err{color:#8A4B33;}
+.foot{margin-top:44px;border-top:1px solid #D8CFBC;padding-top:14px;font-size:13px;color:#5A5248;} .foot a{color:#2F5D3A;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="home" href="index.html">&larr; Lobs News</a>
+<h1>Contact us</h1>
+<p>Questions, corrections, a story we missed, or anything else &mdash; send it our way and it goes straight to the Lobs News team.</p>
+<p class="muted">Your email is required so we can reply. We use it only to respond to you, we never sell or share it, and you can ask us to delete it anytime. See our <a href="privacy.html">Privacy Policy</a>.</p>
+
+<label for="email">Your email</label>
+<input id="email" type="email" placeholder="you@example.com" autocomplete="email"/>
+<label for="message">Message</label>
+<textarea id="message" placeholder="What's on your mind?"></textarea>
+<button id="send">Send message</button>
+<div class="msg" id="msg"></div>
+
+<div class="foot">
+<span class="mark">Lobs <span class="mark2">News</span></span><br/>
+<a href="index.html">Home</a> &nbsp;&middot;&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="tos.html">Terms of Service</a>
+</div>
+</div>
+
+<script>
+const FUNCTIONS_BASE = "https://wfpokgexkjumsbnwcxfo.functions.supabase.co";
+const btn = document.getElementById("send");
+btn.addEventListener("click", async () => {
+  const m = document.getElementById("msg");
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const message = document.getElementById("message").value.trim();
+  if (!email || !email.includes("@")) { m.textContent = "Please enter a valid email so we can reply."; m.className = "msg err"; return; }
+  if (!message) { m.textContent = "Please write a message."; m.className = "msg err"; return; }
+  btn.disabled = true; m.textContent = "Sending\u2026"; m.className = "msg";
+  try {
+    const r = await fetch(`${FUNCTIONS_BASE}/lobs-contact`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, message }) });
+    if (r.ok) { m.textContent = "Thanks \u2014 your message is in. We'll reply to the address you gave."; m.className = "msg ok"; document.getElementById("message").value = ""; }
+    else { m.textContent = "Something went wrong sending that. Please try again."; m.className = "msg err"; }
+  } catch (_) { m.textContent = "Couldn't reach the server. Please try again."; m.className = "msg err"; }
+  btn.disabled = false;
+});
+</script>
+</body>
+</html>

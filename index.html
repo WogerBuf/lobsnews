@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Lobs News — Look on the Bright Side</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
+:root{--paper:#F6F2E9;--paper-2:#EFEADD;--ink:#221E18;--ink-soft:#5A5248;--line:#D8CFBC;--green:#2F5D3A;--clay:#8A4B33;--gold:#9A7B33;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.5;background:radial-gradient(120% 80% at 80% -10%,#FBF8F1 0%,rgba(251,248,241,0) 60%),var(--paper);min-height:100vh;padding:34px 22px 48px;}
+.wrap{max-width:1080px;margin:0 auto;}
+.wordmark{display:flex;align-items:baseline;gap:10px;}
+.mark{font-family:'Fraunces',serif;font-weight:600;font-size:42px;letter-spacing:-.5px;}
+.mark2{color:var(--green);}
+.subhead{font-family:'Fraunces',serif;font-weight:400;font-style:italic;font-size:22px;color:var(--clay);margin:6px 0 0;}
+.lead{font-family:'Fraunces',serif;font-weight:400;font-size:20px;line-height:1.45;color:var(--ink);margin:14px 0 0;max-width:720px;}
+.rule{height:2px;background:var(--ink);margin:16px 0 12px;}
+.standard{font-size:15px;color:var(--ink-soft);margin:0;max-width:820px;} .standard em{color:var(--clay);font-style:italic;}
+.banner{margin:18px 0 4px;padding:10px 14px;border:1px solid var(--gold);border-radius:4px;background:rgba(154,123,51,.1);color:var(--gold);font-size:14px;}
+.filters{margin:22px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.pill{font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;transition:all .15s;}
+.pill:hover{border-color:var(--ink);color:var(--ink);} .pill-on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.refresh{margin-left:auto;font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border:1px solid var(--green);color:var(--green);background:transparent;border-radius:999px;cursor:pointer;} .refresh:hover{background:var(--green);color:var(--paper);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;}
+.card{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:20px 20px 16px;display:flex;flex-direction:column;}
+.ctop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
+.cat{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
+.badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;font-weight:500;}
+.ok{background:rgba(47,93,58,.14);color:var(--green);} .caution{background:rgba(154,123,51,.18);color:var(--gold);} .sample{background:rgba(90,82,72,.12);color:var(--ink-soft);}
+.hl{font-family:'Fraunces',serif;font-weight:500;font-size:22px;line-height:1.2;margin:0 0 8px;}
+.sum{font-size:16px;margin:0 0 12px;} .basis,.caveat{font-size:14px;margin:0 0 10px;}
+.lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);font-weight:500;margin-bottom:2px;} .lbl-c{color:var(--clay);}
+.caveat{color:var(--ink-soft);font-style:italic;border-left:2px solid var(--clay);padding-left:11px;}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 8px;align-items:center;}
+.sig{font-size:11px;padding:2px 9px;border-radius:999px;} .s-strong{background:rgba(47,93,58,.13);color:var(--green);}.s-mid{background:rgba(154,123,51,.16);color:var(--gold);}.s-soft{background:rgba(90,82,72,.1);color:var(--ink-soft);}
+.conf{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft);} .dot{width:9px;height:9px;border-radius:50%;display:inline-block;} .d-strong{background:var(--green);}.d-mid{background:var(--gold);}.d-soft{background:#B9AE98;}
+.foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;position:relative;}
+.share-btn{font-family:'Newsreader',serif;font-size:13px;color:var(--ink-soft);background:none;border:none;cursor:pointer;padding:2px 0;border-bottom:1px solid transparent;}
+.share-btn:hover{color:var(--ink);border-bottom-color:var(--line);}
+.share-menu{position:absolute;bottom:38px;left:0;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.10);display:flex;flex-direction:column;gap:2px;z-index:20;min-width:158px;}
+.share-menu a,.share-menu button{font-family:'Newsreader',serif;font-size:14px;text-align:left;color:var(--ink);text-decoration:none;background:none;border:none;cursor:pointer;padding:7px 10px;border-radius:4px;}
+.share-menu a:hover,.share-menu button:hover{background:var(--paper-2);}
+.sitefoot{margin:34px auto 0;text-align:center;font-size:13px;color:var(--ink-soft);}
+.sitefoot a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);}
+.sitefoot a:hover{color:var(--ink);}
+.src{font-size:13px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);} .src:hover{border-color:var(--ink);}
+.loading{margin:60px auto;text-align:center;color:var(--ink-soft);font-size:17px;}
+.spin{width:30px;height:30px;border:2px solid var(--line);border-top-color:var(--green);border-radius:50%;margin:0 auto 16px;animation:sp .8s linear infinite;} @keyframes sp{to{transform:rotate(360deg);}}
+.note{margin:30px auto 0;font-size:13px;color:var(--ink-soft);font-style:italic;text-align:center;}
+.subscribe{max-width:480px;margin:36px auto 0;text-align:center;border-top:1px solid var(--line);padding-top:24px;}
+.subscribe p{font-family:'Fraunces',serif;font-size:18px;color:var(--ink);margin:0 0 12px;}
+.subrow{display:flex;gap:8px;}
+.subrow input{flex:1;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);} .subrow input:focus{outline:none;border-color:var(--green);}
+.subrow button{font-family:'Newsreader',serif;font-size:16px;padding:10px 18px;border:1px solid var(--green);background:var(--green);color:var(--paper);border-radius:4px;cursor:pointer;}
+.submsg{margin-top:10px;font-size:14px;min-height:18px;}
+/* gate */
+.gate{max-width:460px;margin:8vh auto 0;text-align:center;} .gate .wordmark{justify-content:center;}
+.gate-card{margin-top:26px;background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:26px 24px;}
+.gate-card p{margin:0 0 16px;color:var(--ink-soft);font-size:15px;}
+.gate-row{display:flex;gap:8px;}
+.gate-row input{flex:1;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);} .gate-row input:focus{outline:none;border-color:var(--green);}
+.gate-row button{font-family:'Newsreader',serif;font-size:16px;padding:10px 18px;border:1px solid var(--green);background:var(--green);color:var(--paper);border-radius:4px;cursor:pointer;} .gate-row button:hover{background:#264c30;}
+.gate-msg{margin-top:12px;font-size:14px;min-height:20px;} .gate-err{color:var(--clay);} .gate-ok{color:var(--green);}
+.gate-notify{margin-top:14px;font-family:'Newsreader',serif;font-size:15px;padding:8px 16px;border:1px solid var(--green);background:transparent;color:var(--green);border-radius:4px;cursor:pointer;} .gate-notify:hover{background:var(--green);color:var(--paper);}
+.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="wordmark"><span class="mark">Lobs</span><span class="mark mark2">News</span></div>
+  <p class="subhead">Look on the Bright Side</p>
+  <div class="gate-card">
+    <p>Private beta. Enter your approved email to read.</p>
+    <div class="gate-row"><input id="email" type="email" placeholder="you@example.com" autocomplete="email"/><button id="enter">Enter</button></div>
+    <div class="gate-msg" id="gateMsg"></div>
+    <button id="notifyBtn" class="hidden gate-notify">Notify me when it opens</button>
+  </div>
+  <div class="sitefoot"><a href="privacy.html">Privacy</a> &middot; <a href="tos.html">Terms</a> &middot; <a href="contact.html">Contact</a></div>
+</div>
+
+<div class="wrap hidden" id="app">
+  <div class="wordmark"><span class="mark">Lobs</span><span class="mark mark2">News</span></div>
+  <p class="subhead">Look on the Bright Side</p>
+  <p class="lead">Good things are happening all the time, but bad news travels faster. Come on in and read about some of the positivity out there today.</p>
+  <div class="rule"></div>
+  <p class="standard">The good that's easy to miss, from anywhere in the world &mdash; the environment and the creatures in it, people being good to each other, science and health that helps, hard-won human feats, real progress on fairness, and the small player beating the giant. No politics. Two checks before anything appears: one finds it, a second re-verifies it against a reputable source and throws out whatever&rsquo;s overblown or unproven. What&rsquo;s left says what happened, what backs it, and <em>what it doesn&rsquo;t mean.</em></p>
+  <div id="banner"></div>
+  <div class="filters" id="filters"></div>
+  <div id="content"><div class="loading"><div class="spin"></div><p>Loading the latest\u2026</p></div></div>
+  <p class="note" id="note"></p>
+  <div class="subscribe" id="subBox">
+    <p>Like it? Get the good news in your inbox.</p>
+    <div class="subrow"><input id="subEmail" type="email" placeholder="you@example.com" autocomplete="email"/><button id="subBtn">Subscribe</button></div>
+    <div class="submsg" id="subMsg"></div>
+  </div>
+  <div class="sitefoot"><a href="privacy.html">Privacy</a> &middot; <a href="tos.html">Terms</a> &middot; <a href="contact.html">Contact</a></div>
+</div>
+
+<script>
+const FUNCTIONS_BASE = "https://wfpokgexkjumsbnwcxfo.functions.supabase.co";
+const CATEGORIES=["Environment","Animals","Protection","Kindness","Science & Health","Human Feats","Equality","David vs Goliath"];
+
+const SAMPLES=[
+ {headline:"A national reserve expanded its protected area",summary:"A government added land to an existing reserve, enlarging habitat under formal protection.",basis:"Official protected-area designation.",caveat:"Protection on paper; enforcement and funding decide whether it holds.",category:"Protection",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
+ {headline:"A once-declining bird population rose after habitat work",summary:"Field surveys recorded higher numbers following years of restoration.",basis:"Multi-year survey counts.",caveat:"One species in one region; recovery can reverse without sustained support.",category:"Animals",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
+ {headline:"Volunteers logged a record turnout for a coastal cleanup",summary:"A local group removed debris and recorded what they found to guide future efforts.",basis:"Organizer's cleanup tally.",caveat:"Local and temporary unless paired with cutting the source of the waste.",category:"Kindness",significance:"Local or one-off",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
+ {headline:"A controlled trial reported modest gains for a psychedelic-assisted therapy",summary:"A pre-registered trial found a measurable but moderate benefit versus existing care.",basis:"A single pre-registered randomized trial.",caveat:"One trial is not replication; effect was moderate and needs confirmation.",category:"Science & Health",significance:"Notable but early",confidence:"Early",source_name:"(placeholder)",source_url:"#"},
+ {headline:"A solo rower completed an ocean crossing for charity",summary:"An endurance rower finished a long-planned crossing safely and raised funds en route.",basis:"Tracker logs and event reporting.",caveat:"A personal feat; inspiring rather than broadly consequential.",category:"Human Feats",significance:"Local or one-off",confidence:"Well established",source_name:"(placeholder)",source_url:"#"},
+ {headline:"A river was granted legal rights to be protected",summary:"A jurisdiction recognized a river as a legal entity whose health can be defended in court.",basis:"Enacted legal instrument.",caveat:"Rights on paper; enforcement and standing in practice remain to be tested.",category:"Protection",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"}
+];
+
+let ALL=[], ACTIVE="All", IS_SAMPLE=false, LAST_EMAIL="";
+function sigCls(s=""){s=s.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"s-strong";if(s.includes("notable"))return"s-mid";return"s-soft";}
+function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";if(s.includes("moderate"))return"d-mid";return"d-soft";}
+function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function renderFilters(){
+  const f=document.getElementById("filters");
+  const cats=["All",...CATEGORIES.filter(c=>ALL.some(s=>s.category===c))];
+  f.innerHTML=cats.map(c=>`<button class="pill${c===ACTIVE?' pill-on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join("")+`<button class="refresh" id="refresh">&#8635; Refresh</button>`;
+  f.querySelectorAll(".pill").forEach(b=>b.addEventListener("click",()=>{ACTIVE=b.getAttribute("data-c");renderFilters();renderCards();}));
+  document.getElementById("refresh").addEventListener("click",loadFeed);
+}
+function renderCards(){
+  const c=document.getElementById("content");
+  const items=ACTIVE==="All"?ALL:ALL.filter(s=>s.category===ACTIVE);
+  if(!items.length){c.innerHTML='<div class="loading"><p>Nothing here yet.</p></div>';return;}
+  c.innerHTML='<div class="grid">'+items.map(s=>{
+    const verified=(s.verification||"").toLowerCase().includes("verif");
+    const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?'<span class="badge ok">\u2713 Verified</span>':'<span class="badge caution">\u25B3 Caution</span>');
+    return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span>${badge}</div>
+      <h2 class="hl">${esc(s.headline)}</h2><p class="sum">${esc(s.summary)}</p>
+      ${s.basis?`<p class="basis"><span class="lbl">Basis</span>${esc(s.basis)}</p>`:""}
+      ${s.caveat?`<p class="caveat"><span class="lbl lbl-c">What it doesn't mean</span>${esc(s.caveat)}</p>`:""}
+      <div class="meta"><span class="sig ${sigCls(s.significance)}">${esc(s.significance)}</span><span class="conf"><span class="dot ${confCls(s.confidence)}"></span>${esc(s.confidence)}</span></div>
+      ${s.check_note?`<p style="font-size:12px;color:var(--ink-soft);margin:0 0 4px;">Checked &mdash; ${esc(s.check_note)}</p>`:""}
+      <div class="foot"><button class="share-btn" data-h="${esc(s.headline)}" data-u="${esc(s.source_url||"")}">Share</button>${s.source_url&&s.source_url!=="#"?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>';
+}
+function render(items,isSample){ALL=items;IS_SAMPLE=isSample;ACTIVE="All";renderFilters();renderCards();}
+function showApp(){document.getElementById("gate").classList.add("hidden");document.getElementById("app").classList.remove("hidden");wireSubscribe();}
+
+async function fetchFeed(email){
+  const r=await fetch(`${FUNCTIONS_BASE}/lobs-feed`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  if(r.status===403) return {ok:false,reason:"not_approved"};
+  if(!r.ok) throw new Error("feed "+r.status);
+  const d=await r.json(); return {ok:true,stories:d.stories||[]};
+}
+async function subscribe(email){
+  const r=await fetch(`${FUNCTIONS_BASE}/lobs-subscribe`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  return r.ok;
+}
+
+async function loadFeed(){
+  document.getElementById("content").innerHTML='<div class="loading"><div class="spin"></div><p>Loading the latest\u2026</p></div>';
+  document.getElementById("banner").innerHTML="";
+  const email=localStorage.getItem("lobs_email");
+  if(!email){ render(SAMPLES,true); return; }
+  try{
+    const res=await fetchFeed(email);
+    if(!res.ok){ localStorage.removeItem("lobs_email"); location.reload(); return; }
+    if(!res.stories.length){ document.getElementById("content").innerHTML='<div class="loading"><p>No stories yet \u2014 the daily run will populate this shortly.</p></div>'; return; }
+    render(res.stories,false);
+    document.getElementById("note").innerHTML="Each item survived a second-pass source check \u2014 still, verify anything that matters against the link.";
+  }catch(e){
+    document.getElementById("banner").innerHTML='<div class="banner">Couldn\u2019t reach the feed ('+esc(e.message)+'). Showing sample layout.</div>';
+    render(SAMPLES,true);
+  }
+}
+
+function setMsg(t,cls){const m=document.getElementById("gateMsg");m.textContent=t;m.className="gate-msg "+(cls||"");}
+async function tryEnter(){
+  const email=document.getElementById("email").value.trim().toLowerCase();
+  LAST_EMAIL=email;
+  if(!email||!email.includes("@")){setMsg("Enter a valid email.","gate-err");return;}
+  setMsg("Checking\u2026","");
+  document.getElementById("notifyBtn").classList.add("hidden");
+  try{
+    const res=await fetchFeed(email);
+    if(!res.ok){ setMsg("That email isn\u2019t on the beta list yet \u2014 want updates when we open up?","gate-err"); document.getElementById("notifyBtn").classList.remove("hidden"); return; }
+    localStorage.setItem("lobs_email",email); showApp(); render(res.stories,false);
+    document.getElementById("note").innerHTML="Each item survived a second-pass source check \u2014 still, verify anything that matters against the link.";
+  }catch(e){ setMsg("Something went wrong. Try again.","gate-err"); }
+}
+function wireSubscribe(){
+  const btn=document.getElementById("subBtn"); if(!btn||btn.dataset.wired) return; btn.dataset.wired="1";
+  btn.addEventListener("click", async ()=>{
+    const m=document.getElementById("subMsg"); const e=document.getElementById("subEmail").value.trim().toLowerCase();
+    if(!e||!e.includes("@")){m.textContent="Enter a valid email.";m.className="submsg gate-err";return;}
+    m.textContent="Subscribing\u2026";m.className="submsg";
+    try{ const ok=await subscribe(e); m.textContent=ok?"You\u2019re on the list. Thanks!":"Hmm, try again."; m.className="submsg "+(ok?"gate-ok":"gate-err"); if(ok) document.getElementById("subEmail").value=""; }
+    catch(_){ m.textContent="Something went wrong."; m.className="submsg gate-err"; }
+  });
+}
+
+document.getElementById("enter").addEventListener("click",tryEnter);
+document.getElementById("email").addEventListener("keydown",e=>{if(e.key==="Enter")tryEnter();});
+document.getElementById("notifyBtn").addEventListener("click", async ()=>{
+  const m=document.getElementById("gateMsg");
+  try{ const ok=await subscribe(LAST_EMAIL); m.textContent=ok?"Thanks \u2014 we\u2019ll be in touch.":"Try again."; m.className="gate-msg "+(ok?"gate-ok":"gate-err"); if(ok) document.getElementById("notifyBtn").classList.add("hidden"); }
+  catch(_){ m.textContent="Try again."; m.className="gate-msg gate-err"; }
+});
+
+function closeShareMenus(){ document.querySelectorAll(".share-menu").forEach(el=>el.remove()); }
+function buildShareMenu(h,u){
+  const url=u||"https://lobsnews.com"; const text=h+" \u2014 via Lobs News"; const enc=encodeURIComponent;
+  const menu=document.createElement("div"); menu.className="share-menu";
+  menu.innerHTML=
+    `<a href="https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}" target="_blank" rel="noreferrer">Share on X</a>`+
+    `<a href="https://www.facebook.com/sharer/sharer.php?u=${enc(url)}" target="_blank" rel="noreferrer">Share on Facebook</a>`+
+    `<a href="https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}" target="_blank" rel="noreferrer">Share on LinkedIn</a>`+
+    `<a href="mailto:?subject=${enc(h)}&body=${enc(text+"\n\n"+url)}">Email</a>`+
+    `<button type="button" data-copy="${esc(url)}">Copy link</button>`;
+  return menu;
+}
+document.addEventListener("click",(e)=>{
+  const btn=e.target.closest(".share-btn");
+  if(btn){
+    e.stopPropagation();
+    const h=btn.dataset.h||"", u=btn.dataset.u||"";
+    if(navigator.share){ navigator.share({title:h,text:h+" \u2014 via Lobs News",url:u||"https://lobsnews.com"}).catch(()=>{}); return; }
+    const open=btn.parentElement.querySelector(".share-menu"); closeShareMenus();
+    if(open) return;
+    btn.parentElement.appendChild(buildShareMenu(h,u)); return;
+  }
+  const copyBtn=e.target.closest(".share-menu button[data-copy]");
+  if(copyBtn){
+    e.stopPropagation();
+    const v=copyBtn.getAttribute("data-copy");
+    if(navigator.clipboard){ navigator.clipboard.writeText(v).then(()=>{ copyBtn.textContent="Copied!"; setTimeout(closeShareMenus,800); }).catch(()=>{ copyBtn.textContent="Copy failed"; }); }
+    return;
+  }
+  if(!e.target.closest(".share-menu")) closeShareMenus();
+});
+
+(function init(){ const saved=localStorage.getItem("lobs_email"); if(saved){ showApp(); loadFeed(); } })();
+</script>
+</body>
+</html>
