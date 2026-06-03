@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Lobs News — Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
+:root{--paper:#F6F2E9;--paper-2:#EFEADD;--ink:#221E18;--ink-soft:#5A5248;--line:#D8CFBC;--green:#2F5D3A;--clay:#8A4B33;--gold:#9A7B33;}
+*{box-sizing:border-box;}
+body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.5;background:var(--paper);min-height:100vh;padding:28px 18px 60px;}
+.wrap{max-width:860px;margin:0 auto;}
+.mark{font-family:'Fraunces',serif;font-weight:600;font-size:30px;letter-spacing:-.5px;}
+.mark2{color:var(--green);}
+.tag{font-family:'Fraunces',serif;font-style:italic;color:var(--clay);font-size:16px;margin:2px 0 0;}
+.sub{font-size:13px;color:var(--ink-soft);margin:4px 0 22px;}
+input,select,button{font-family:'Newsreader',serif;font-size:15px;}
+.login{max-width:420px;margin:6vh auto 0;background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:24px;}
+.login p{margin:0 0 14px;color:var(--ink-soft);font-size:14px;}
+.login input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);min-width:0;}
+.btn{padding:9px 16px;border-radius:4px;border:1px solid var(--green);background:var(--green);color:var(--paper);cursor:pointer;}
+.btn:hover{background:#264c30;}
+.btn-ghost{background:transparent;color:var(--green);}
+.btn-ghost:hover{background:var(--green);color:var(--paper);}
+.btn-clay{border-color:var(--clay);background:var(--clay);} .btn-clay:hover{background:#6f3a26;}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.count{font-size:13px;color:var(--ink-soft);}
+.card{background:var(--paper-2);border:1px solid var(--line);border-radius:5px;padding:14px 16px;margin-bottom:12px;}
+.card.held{border-color:var(--clay);background:rgba(138,75,51,.06);}
+.cat{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
+.hl{font-family:'Fraunces',serif;font-weight:500;font-size:18px;line-height:1.25;margin:3px 0 6px;}
+.when{font-size:12px;color:var(--ink-soft);margin-bottom:10px;}
+.status{font-size:13px;margin-bottom:10px;}
+.status.held{color:var(--clay);font-weight:500;}
+.status.live{color:var(--green);}
+.controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.controls .hb{padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;font-size:13px;}
+.controls .hb:hover{border-color:var(--clay);color:var(--clay);}
+.controls input[type=datetime-local]{padding:5px 8px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);font-size:13px;min-width:0;}
+.release{padding:5px 13px;border-radius:999px;border:1px solid var(--green);background:transparent;color:var(--green);cursor:pointer;font-size:13px;}
+.release:hover{background:var(--green);color:var(--paper);}
+.msg{font-size:13px;min-height:18px;margin:6px 0;}
+.err{color:var(--clay);} .ok{color:var(--green);}
+.logout{font-size:13px;color:var(--ink-soft);background:none;border:none;text-decoration:underline;cursor:pointer;}
+.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="mark">Lobs <span class="mark2">News</span></div>
+  <p class="tag">Admin</p>
+
+  <!-- LOGIN -->
+  <div class="login" id="login">
+    <p>Enter the admin token to manage holds.</p>
+    <input id="token" type="password" placeholder="admin token" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/>
+    <div class="msg err" id="loginMsg"></div>
+    <button class="btn" id="loginBtn" style="margin-top:6px;">Unlock</button>
+  </div>
+
+  <!-- PANEL -->
+  <div class="hidden" id="panel">
+    <p class="sub">Hold a story to keep it out of the public feed until its timer runs out. It returns automatically — nothing else is affected.</p>
+    <div class="bar">
+      <span class="count" id="count"></span>
+      <div class="row">
+        <button class="btn btn-ghost" id="reload">Reload</button>
+        <button class="logout" id="logout">Lock</button>
+      </div>
+    </div>
+    <div class="msg" id="panelMsg"></div>
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+const FUNCTIONS_BASE = "https://wfpokgexkjumsbnwcxfo.functions.supabase.co";
+let SERVER_NOW = Date.now();
+
+function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function tok(){return localStorage.getItem("lobs_admin_token")||"";}
+function fmt(iso){try{return new Date(iso).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});}catch(e){return iso;}}
+
+async function api(action, extra){
+  const r = await fetch(`${FUNCTIONS_BASE}/lobs-admin`,{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(Object.assign({token:tok(),action},extra||{}))
+  });
+  let d={}; try{d=await r.json();}catch(_){}
+  return {status:r.status, d};
+}
+
+function show(view){
+  document.getElementById("login").classList.toggle("hidden", view!=="login");
+  document.getElementById("panel").classList.toggle("hidden", view!=="panel");
+}
+
+async function unlock(){
+  const t = document.getElementById("token").value.trim();
+  if(!t){document.getElementById("loginMsg").textContent="Enter the token.";return;}
+  localStorage.setItem("lobs_admin_token", t);
+  const {status} = await api("list");
+  if(status===403){ localStorage.removeItem("lobs_admin_token"); document.getElementById("loginMsg").textContent="That token wasn't accepted."; return; }
+  document.getElementById("loginMsg").textContent="";
+  show("panel"); load();
+}
+
+function statusLine(s){
+  const held = s.hold_until && new Date(s.hold_until).getTime() > SERVER_NOW;
+  if(held) return `<div class="status held">On hold until ${esc(fmt(s.hold_until))}</div>`;
+  return `<div class="status live">Live in the feed</div>`;
+}
+
+function controls(s){
+  const held = s.hold_until && new Date(s.hold_until).getTime() > SERVER_NOW;
+  if(held){
+    return `<div class="controls"><button class="release" data-rel="${esc(s.id)}">Release now</button>
+      <span style="font-size:12px;color:var(--ink-soft);">or extend:</span>
+      <button class="hb" data-id="${esc(s.id)}" data-h="24">+1 day</button>
+      <button class="hb" data-id="${esc(s.id)}" data-h="72">+3 days</button></div>`;
+  }
+  return `<div class="controls">
+      <span style="font-size:12px;color:var(--ink-soft);">Hold for:</span>
+      <button class="hb" data-id="${esc(s.id)}" data-h="6">6h</button>
+      <button class="hb" data-id="${esc(s.id)}" data-h="12">12h</button>
+      <button class="hb" data-id="${esc(s.id)}" data-h="24">1 day</button>
+      <button class="hb" data-id="${esc(s.id)}" data-h="72">3 days</button>
+      <button class="hb" data-id="${esc(s.id)}" data-h="168">7 days</button>
+      <input type="datetime-local" id="dt-${esc(s.id)}"/>
+      <button class="hb" data-untilid="${esc(s.id)}">Hold until\u2026</button>
+    </div>`;
+}
+
+function render(stories){
+  document.getElementById("count").textContent = stories.length + " stories" +
+    (stories.filter(s=>s.hold_until && new Date(s.hold_until).getTime()>SERVER_NOW).length ? " \u00b7 " + stories.filter(s=>s.hold_until && new Date(s.hold_until).getTime()>SERVER_NOW).length + " on hold" : "");
+  const list = document.getElementById("list");
+  list.innerHTML = stories.map(s=>{
+    const held = s.hold_until && new Date(s.hold_until).getTime() > SERVER_NOW;
+    return `<div class="card${held?' held':''}">
+      <div class="cat">${esc(s.category)}${s.verification?` \u00b7 ${esc(s.verification)}`:""}</div>
+      <div class="hl">${esc(s.headline)}</div>
+      <div class="when">First seen ${esc(fmt(s.first_seen))}</div>
+      ${statusLine(s)}
+      ${controls(s)}
+    </div>`;
+  }).join("");
+
+  list.querySelectorAll(".hb[data-h]").forEach(b=>b.addEventListener("click",()=>doHold(b.getAttribute("data-id"),{hours:Number(b.getAttribute("data-h"))})));
+  list.querySelectorAll(".hb[data-untilid]").forEach(b=>b.addEventListener("click",()=>{
+    const id=b.getAttribute("data-untilid"); const v=document.getElementById("dt-"+id).value;
+    if(!v){msg("Pick a date and time first.","err");return;}
+    doHold(id,{hold_until:new Date(v).toISOString()});
+  }));
+  list.querySelectorAll(".release").forEach(b=>b.addEventListener("click",()=>doRelease(b.getAttribute("data-rel"))));
+}
+
+function msg(t,cls){const m=document.getElementById("panelMsg");m.textContent=t;m.className="msg "+(cls||"");}
+
+async function load(){
+  msg("Loading\u2026","");
+  const {status,d} = await api("list");
+  if(status===403){ logout(); return; }
+  if(!d.ok){ msg(d.error||"Couldn't load.","err"); return; }
+  if(d.now) SERVER_NOW = new Date(d.now).getTime();
+  msg("","");
+  render(d.stories||[]);
+}
+
+async function doHold(id, extra){
+  msg("Holding\u2026","");
+  const {d} = await api("hold", Object.assign({id},extra));
+  if(!d.ok){ msg(d.error||"Hold failed.","err"); return; }
+  msg("Held until "+fmt(d.hold_until)+".","ok"); load();
+}
+async function doRelease(id){
+  msg("Releasing\u2026","");
+  const {d} = await api("release",{id});
+  if(!d.ok){ msg(d.error||"Release failed.","err"); return; }
+  msg("Released.","ok"); load();
+}
+function logout(){ localStorage.removeItem("lobs_admin_token"); document.getElementById("token").value=""; show("login"); }
+
+document.getElementById("loginBtn").addEventListener("click",unlock);
+document.getElementById("token").addEventListener("keydown",e=>{if(e.key==="Enter")unlock();});
+document.getElementById("reload").addEventListener("click",load);
+document.getElementById("logout").addEventListener("click",logout);
+
+(function init(){ if(tok()){ show("panel"); load(); } else { show("login"); } })();
+</script>
+</body>
+</html>
