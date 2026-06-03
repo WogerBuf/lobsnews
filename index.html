@@ -141,7 +141,7 @@ function renderCards(){
     const verified=(s.verification||"").toLowerCase().includes("verif");
     const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?'<span class="badge ok">\u2713 Verified</span>':'<span class="badge caution">\u25B3 Caution</span>');
     return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span>${badge}</div>
-      <h2 class="hl">${esc(s.headline)}</h2><p class="sum">${esc(s.summary)}</p>
+      <h2 class="hl">${esc(s.headline)}</h2>
       ${s.basis?`<p class="basis"><span class="lbl">Basis</span>${esc(s.basis)}</p>`:""}
       ${s.caveat?`<p class="caveat"><span class="lbl lbl-c">What it doesn't mean</span>${esc(s.caveat)}</p>`:""}
       <div class="meta"><span class="sig ${sigCls(s.significance)}">${esc(s.significance)}</span><span class="conf"><span class="dot ${confCls(s.confidence)}"></span>${esc(s.confidence)}</span></div>
