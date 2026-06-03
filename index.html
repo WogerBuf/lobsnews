@@ -14,6 +14,8 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 .mark{font-family:'Fraunces',serif;font-weight:600;font-size:42px;letter-spacing:-.5px;}
 .mark2{color:var(--green);}
 .subhead{font-family:'Fraunces',serif;font-weight:400;font-style:italic;font-size:22px;color:var(--clay);margin:6px 0 0;}
+.subhead .ac{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;}
+.subhead .the{font-style:normal;font-size:.66em;color:var(--ink-soft);opacity:.8;}
 .lead{font-family:'Fraunces',serif;font-weight:400;font-size:20px;line-height:1.45;color:var(--ink);margin:14px 0 0;max-width:720px;}
 .daily{font-size:13px;color:var(--green);font-weight:500;letter-spacing:.4px;text-transform:uppercase;margin:12px 0 0;}
 .rule{height:2px;background:var(--ink);margin:16px 0 12px;}
@@ -92,7 +94,7 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 
 <div class="gate" id="gate">
   <div class="wordmark"><span class="mark">Lobs</span><span class="mark mark2">News</span></div>
-  <p class="subhead">Look on the Bright Side</p>
+  <p class="subhead"><span class="ac">L</span>ook <span class="ac">O</span>n <span class="the">the</span> <span class="ac">B</span>right <span class="ac">S</span>ide</p>
   <div class="gate-card">
     <p>Private beta. Enter your approved email to read.</p>
     <div class="gate-row"><input id="email" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email"/><button id="enter">Enter</button></div>
@@ -104,7 +106,7 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 
 <div class="wrap hidden" id="app">
   <div class="wordmark"><span class="mark">Lobs</span><span class="mark mark2">News</span></div>
-  <p class="subhead">Look on the Bright Side</p>
+  <p class="subhead"><span class="ac">L</span>ook <span class="ac">O</span>n <span class="the">the</span> <span class="ac">B</span>right <span class="ac">S</span>ide</p>
   <p class="lead">Good things are happening all the time, but bad news travels faster. Come on in and read about some of the positivity out there today.</p>
   <p class="daily">&#8635; Refreshed every morning</p>
   <div class="rule"></div>
@@ -142,7 +144,7 @@ function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";
 function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
 function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"How sure we are \u2014 strong, settled evidence: official data or a confirmed finding.";if(s.includes("moderate"))return"How sure we are \u2014 credible, but with some open questions.";return"How sure we are \u2014 preliminary: a single study or early figures, not yet confirmed.";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const VERSION="v0.5.0", BUILD="2026-06-03";
+const VERSION="v0.5.1", BUILD="2026-06-03";
 function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
 const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
 const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
