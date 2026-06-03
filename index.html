@@ -139,10 +139,10 @@ const SAMPLES=[
 let ALL=[], ACTIVE="All", IS_SAMPLE=false, LAST_EMAIL="";
 function sigCls(s=""){s=s.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"s-strong";if(s.includes("notable"))return"s-mid";return"s-soft";}
 function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";if(s.includes("moderate"))return"d-mid";return"d-soft";}
-function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"Part of a broad, structural shift \u2014 not a one-time event.";if(s.includes("notable"))return"Real and meaningful, but provisional \u2014 its staying power isn't established yet.";return"A contained, single event \u2014 good, but specific to one place or moment.";}
-function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"Strong, settled evidence \u2014 official data or a confirmed event.";if(s.includes("moderate"))return"Credible, but with some open questions.";return"Preliminary \u2014 a single study or early figures, not yet confirmed.";}
+function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
+function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"How sure we are \u2014 strong, settled evidence: official data or a confirmed finding.";if(s.includes("moderate"))return"How sure we are \u2014 credible, but with some open questions.";return"How sure we are \u2014 preliminary: a single study or early figures, not yet confirmed.";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const VERSION="v0.4.1", BUILD="2026-06-03";
+const VERSION="v0.4.2", BUILD="2026-06-03";
 function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
 const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
 const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
