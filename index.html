@@ -73,7 +73,7 @@ body{margin:0;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-heigh
   <p class="subhead">Look on the Bright Side</p>
   <div class="gate-card">
     <p>Private beta. Enter your approved email to read.</p>
-    <div class="gate-row"><input id="email" type="email" placeholder="you@example.com" autocomplete="email"/><button id="enter">Enter</button></div>
+    <div class="gate-row"><input id="email" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email"/><button id="enter">Enter</button></div>
     <div class="gate-msg" id="gateMsg"></div>
     <button id="notifyBtn" class="hidden gate-notify">Notify me when it opens</button>
   </div>
@@ -178,7 +178,7 @@ async function tryEnter(){
   document.getElementById("notifyBtn").classList.add("hidden");
   try{
     const res=await fetchFeed(email);
-    if(!res.ok){ setMsg("That email isn\u2019t on the beta list yet \u2014 want updates when we open up?","gate-err"); document.getElementById("notifyBtn").classList.remove("hidden"); return; }
+    if(!res.ok){ setMsg("\u201C"+email+"\u201D isn\u2019t on the beta list yet \u2014 want updates when we open up?","gate-err"); document.getElementById("notifyBtn").classList.remove("hidden"); return; }
     localStorage.setItem("lobs_email",email); showApp(); render(res.stories,false);
     document.getElementById("note").innerHTML="Each item survived a second-pass source check \u2014 still, verify anything that matters against the link.";
   }catch(e){ setMsg("Something went wrong. Try again.","gate-err"); }
