@@ -37,6 +37,11 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 .meta{display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 8px;align-items:center;}
 .sig{font-size:11px;padding:2px 9px;border-radius:999px;} .s-strong{background:rgba(47,93,58,.13);color:var(--green);}.s-mid{background:rgba(154,123,51,.16);color:var(--gold);}.s-soft{background:rgba(90,82,72,.1);color:var(--ink-soft);}
 .conf{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft);} .dot{width:9px;height:9px;border-radius:50%;display:inline-block;} .d-strong{background:var(--green);}.d-mid{background:var(--gold);}.d-soft{background:#B9AE98;}
+.has-tip{position:relative;cursor:help;}
+.has-tip:focus{outline:none;}
+.has-tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 9px);width:max-content;max-width:240px;background:var(--ink);color:var(--paper);font-size:12px;line-height:1.4;font-style:normal;text-transform:none;letter-spacing:normal;text-align:left;padding:8px 11px;border-radius:6px;box-shadow:0 8px 22px rgba(0,0,0,.20);opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .12s ease,transform .12s ease;z-index:30;pointer-events:none;}
+.has-tip::before{content:"";position:absolute;left:16px;bottom:calc(100% + 4px);border:5px solid transparent;border-top-color:var(--ink);opacity:0;visibility:hidden;transition:opacity .12s ease;z-index:31;pointer-events:none;}
+.has-tip:hover::after,.has-tip:focus::after,.has-tip:hover::before,.has-tip:focus::before{opacity:1;visibility:visible;transform:translateY(0);}
 .foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;position:relative;}
 .share-btn{font-family:'Newsreader',serif;font-size:13px;color:var(--ink-soft);background:none;border:none;cursor:pointer;padding:2px 0;border-bottom:1px solid transparent;}
 .share-btn:hover{color:var(--ink);border-bottom-color:var(--line);}
@@ -134,8 +139,10 @@ const SAMPLES=[
 let ALL=[], ACTIVE="All", IS_SAMPLE=false, LAST_EMAIL="";
 function sigCls(s=""){s=s.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"s-strong";if(s.includes("notable"))return"s-mid";return"s-soft";}
 function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";if(s.includes("moderate"))return"d-mid";return"d-soft";}
+function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"Part of a broad, structural shift \u2014 not a one-time event.";if(s.includes("notable"))return"Real and meaningful, but provisional \u2014 its staying power isn't established yet.";return"A contained, single event \u2014 good, but specific to one place or moment.";}
+function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"Strong, settled evidence \u2014 official data or a confirmed event.";if(s.includes("moderate"))return"Credible, but with some open questions.";return"Preliminary \u2014 a single study or early figures, not yet confirmed.";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const VERSION="v0.4.0", BUILD="2026-06-03";
+const VERSION="v0.4.1", BUILD="2026-06-03";
 function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
 const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
 const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
@@ -173,11 +180,14 @@ function renderCards(){
     const dh=niceHeadline(s.headline,s.source_name);
     const hasLink=s.source_url&&s.source_url!=="#";
     const hl=hasLink?`<a href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(dh)}</a>`:esc(dh);
+    const sigV=s.significance||"", confV=s.confidence||"";
+    const sigSpan=sigV?`<span class="sig has-tip ${sigCls(sigV)}" tabindex="0" role="note" data-tip="${esc(sigHelp(sigV))}" aria-label="Significance \u2014 ${esc(sigV)}. ${esc(sigHelp(sigV))}">${esc(sigV)}</span>`:"";
+    const confSpan=confV?`<span class="conf has-tip" tabindex="0" role="note" data-tip="${esc(confHelp(confV))}" aria-label="Confidence \u2014 ${esc(confV)}. ${esc(confHelp(confV))}"><span class="dot ${confCls(confV)}"></span>${esc(confV)}</span>`:"";
     return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span>${badge}</div>
       <h2 class="hl">${hl}</h2>
       ${s.basis?`<p class="basis"><span class="lbl">What backs it</span>${esc(s.basis)}</p>`:""}
       ${s.caveat?`<p class="caveat"><span class="lbl lbl-c">What it doesn't mean</span>${esc(s.caveat)}</p>`:""}
-      <div class="meta"><span class="sig ${sigCls(s.significance)}">${esc(s.significance)}</span><span class="conf"><span class="dot ${confCls(s.confidence)}"></span>${esc(s.confidence)}</span></div>
+      <div class="meta">${sigSpan}${confSpan}</div>
       ${s.check_note?`<p style="font-size:12px;color:var(--ink-soft);margin:0 0 4px;">Checked &mdash; ${esc(s.check_note)}</p>`:""}
       <div class="foot"><button class="share-btn" data-h="${esc(dh)}" data-u="${esc(s.source_url||"")}">Share</button>${hasLink?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>';
 }
