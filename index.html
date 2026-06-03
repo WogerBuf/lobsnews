@@ -125,15 +125,15 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 
 <script>
 const FUNCTIONS_BASE = "https://wfpokgexkjumsbnwcxfo.functions.supabase.co";
-const CATEGORIES=["Environment","Animals","Protection","Kindness","Science & Health","Human Feats","Equality","David vs Goliath"];
+const CATEGORIES=["Environment","Animals","Kindness","Science & Health","Human Feats","Equality","David vs Goliath"];
 
 const SAMPLES=[
- {headline:"A national reserve expanded its protected area",summary:"A government added land to an existing reserve, enlarging habitat under formal protection.",basis:"Official protected-area designation.",caveat:"Protection on paper; enforcement and funding decide whether it holds.",category:"Protection",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
+ {headline:"A national reserve expanded its protected area",summary:"A government added land to an existing reserve, enlarging habitat under formal protection.",basis:"Official protected-area designation.",caveat:"Protection on paper; enforcement and funding decide whether it holds.",category:"Environment",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
  {headline:"A once-declining bird population rose after habitat work",summary:"Field surveys recorded higher numbers following years of restoration.",basis:"Multi-year survey counts.",caveat:"One species in one region; recovery can reverse without sustained support.",category:"Animals",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
  {headline:"Volunteers logged a record turnout for a coastal cleanup",summary:"A local group removed debris and recorded what they found to guide future efforts.",basis:"Organizer's cleanup tally.",caveat:"Local and temporary unless paired with cutting the source of the waste.",category:"Kindness",significance:"Local or one-off",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
  {headline:"A controlled trial reported modest gains for a psychedelic-assisted therapy",summary:"A pre-registered trial found a measurable but moderate benefit versus existing care.",basis:"A single pre-registered randomized trial.",caveat:"One trial is not replication; effect was moderate and needs confirmation.",category:"Science & Health",significance:"Notable but early",confidence:"Early",source_name:"(placeholder)",source_url:"#"},
  {headline:"A solo rower completed an ocean crossing for charity",summary:"An endurance rower finished a long-planned crossing safely and raised funds en route.",basis:"Tracker logs and event reporting.",caveat:"A personal feat; inspiring rather than broadly consequential.",category:"Human Feats",significance:"Local or one-off",confidence:"Well established",source_name:"(placeholder)",source_url:"#"},
- {headline:"A river was granted legal rights to be protected",summary:"A jurisdiction recognized a river as a legal entity whose health can be defended in court.",basis:"Enacted legal instrument.",caveat:"Rights on paper; enforcement and standing in practice remain to be tested.",category:"Protection",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"}
+ {headline:"A river was granted legal rights to be protected",summary:"A jurisdiction recognized a river as a legal entity whose health can be defended in court.",basis:"Enacted legal instrument.",caveat:"Rights on paper; enforcement and standing in practice remain to be tested.",category:"Environment",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"}
 ];
 
 let ALL=[], ACTIVE="All", IS_SAMPLE=false, LAST_EMAIL="";
@@ -142,7 +142,7 @@ function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";
 function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
 function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"How sure we are \u2014 strong, settled evidence: official data or a confirmed finding.";if(s.includes("moderate"))return"How sure we are \u2014 credible, but with some open questions.";return"How sure we are \u2014 preliminary: a single study or early figures, not yet confirmed.";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const VERSION="v0.4.2", BUILD="2026-06-03";
+const VERSION="v0.5.0", BUILD="2026-06-03";
 function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
 const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
 const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
