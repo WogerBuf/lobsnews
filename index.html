@@ -44,6 +44,8 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 .has-tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 9px);width:max-content;max-width:240px;background:var(--ink);color:var(--paper);font-size:12px;line-height:1.4;font-style:normal;text-transform:none;letter-spacing:normal;text-align:left;padding:8px 11px;border-radius:6px;box-shadow:0 8px 22px rgba(0,0,0,.20);opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .12s ease,transform .12s ease;z-index:30;pointer-events:none;}
 .has-tip::before{content:"";position:absolute;left:16px;bottom:calc(100% + 4px);border:5px solid transparent;border-top-color:var(--ink);opacity:0;visibility:hidden;transition:opacity .12s ease;z-index:31;pointer-events:none;}
 .has-tip:hover::after,.has-tip:focus::after,.has-tip:hover::before,.has-tip:focus::before{opacity:1;visibility:visible;transform:translateY(0);}
+.has-tip.tip-r::after{left:auto;right:0;} .has-tip.tip-r::before{left:auto;right:16px;}
+.has-tip.tip-down::after{top:calc(100% + 9px);bottom:auto;transform:translateY(-4px);} .has-tip.tip-down::before{top:calc(100% + 4px);bottom:auto;border-top-color:transparent;border-bottom-color:var(--ink);}
 .foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;position:relative;}
 .share-btn{font-family:'Newsreader',serif;font-size:13px;color:var(--ink-soft);background:none;border:none;cursor:pointer;padding:2px 0;border-bottom:1px solid transparent;}
 .share-btn:hover{color:var(--ink);border-bottom-color:var(--line);}
@@ -144,7 +146,7 @@ function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";
 function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
 function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"How sure we are \u2014 strong, settled evidence: official data or a confirmed finding.";if(s.includes("moderate"))return"How sure we are \u2014 credible, but with some open questions.";return"How sure we are \u2014 preliminary: a single study or early figures, not yet confirmed.";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const VERSION="v0.5.1", BUILD="2026-06-03";
+const VERSION="v0.5.2", BUILD="2026-06-03";
 function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
 const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
 const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
@@ -178,7 +180,8 @@ function renderCards(){
   if(!items.length){c.innerHTML='<div class="loading"><p>Nothing here yet.</p></div>';return;}
   c.innerHTML='<div class="grid">'+items.map(s=>{
     const verified=(s.verification||"").toLowerCase().includes("verif");
-    const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?'<span class="badge ok">\u2713 Verified</span>':'<span class="badge caution">\u25B3 Caution</span>');
+    const vfTip=verified?"Passed our second source check \u2014 a reputable source directly states this and the claim held up. It's a source check, not an independent fact-check, so confirm anything important at the link.":"Properly sourced, but flagged \u2014 the claim is early, limited in scope, or has open questions. Read it with a grain of salt.";
+    const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?`<span class="badge ok has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Verified. ${esc(vfTip)}">\u2713 Verified</span>`:`<span class="badge caution has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Caution. ${esc(vfTip)}">\u25B3 Caution</span>`);
     const dh=niceHeadline(s.headline,s.source_name);
     const hasLink=s.source_url&&s.source_url!=="#";
     const hl=hasLink?`<a href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(dh)}</a>`:esc(dh);
