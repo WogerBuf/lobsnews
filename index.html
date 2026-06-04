@@ -28,9 +28,10 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;}
 .card{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:20px 20px 16px;display:flex;flex-direction:column;}
 .ctop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
+.bgroup{display:flex;gap:6px;align-items:center;flex-shrink:0;}
 .cat{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
 .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;font-weight:500;}
-.ok{background:rgba(47,93,58,.14);color:var(--green);} .caution{background:rgba(154,123,51,.18);color:var(--gold);} .sample{background:rgba(90,82,72,.12);color:var(--ink-soft);}
+.ok{background:rgba(47,93,58,.14);color:var(--green);} .caution{background:rgba(154,123,51,.18);color:var(--gold);} .sample{background:rgba(90,82,72,.12);color:var(--ink-soft);} .pick{background:rgba(138,75,51,.14);color:var(--clay);}
 .hl{font-family:'Fraunces',serif;font-weight:500;font-size:22px;line-height:1.2;margin:0 0 8px;}
 .hl a{color:inherit;text-decoration:none;} .hl a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--green);}
 .sum{font-size:16px;margin:0 0 12px;} .basis,.caveat{font-size:14px;margin:0 0 10px;}
@@ -130,12 +131,13 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 <script>
 const FUNCTIONS_BASE = "https://wfpokgexkjumsbnwcxfo.functions.supabase.co";
 const CATEGORIES=["Environment","Animals","Kindness","Science & Health","Human Feats","Equality","David vs Goliath"];
+const PICKS="\u2605 Editor's Picks";
 
 const SAMPLES=[
  {headline:"A national reserve expanded its protected area",summary:"A government added land to an existing reserve, enlarging habitat under formal protection.",basis:"Official protected-area designation.",caveat:"Protection on paper; enforcement and funding decide whether it holds.",category:"Environment",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
  {headline:"A once-declining bird population rose after habitat work",summary:"Field surveys recorded higher numbers following years of restoration.",basis:"Multi-year survey counts.",caveat:"One species in one region; recovery can reverse without sustained support.",category:"Animals",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
  {headline:"Volunteers logged a record turnout for a coastal cleanup",summary:"A local group removed debris and recorded what they found to guide future efforts.",basis:"Organizer's cleanup tally.",caveat:"Local and temporary unless paired with cutting the source of the waste.",category:"Kindness",significance:"Local or one-off",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"},
- {headline:"A controlled trial reported modest gains for a psychedelic-assisted therapy",summary:"A pre-registered trial found a measurable but moderate benefit versus existing care.",basis:"A single pre-registered randomized trial.",caveat:"One trial is not replication; effect was moderate and needs confirmation.",category:"Science & Health",significance:"Notable but early",confidence:"Early",source_name:"(placeholder)",source_url:"#"},
+ {headline:"A controlled trial reported modest gains for a psychedelic-assisted therapy",summary:"A pre-registered trial found a measurable but moderate benefit versus existing care.",basis:"A single pre-registered randomized trial.",caveat:"One trial is not replication; effect was moderate and needs confirmation.",category:"Science & Health",significance:"Notable but early",confidence:"Early",source_name:"(placeholder)",source_url:"#",curated:true,curator:"Editor's Pick"},
  {headline:"A solo rower completed an ocean crossing for charity",summary:"An endurance rower finished a long-planned crossing safely and raised funds en route.",basis:"Tracker logs and event reporting.",caveat:"A personal feat; inspiring rather than broadly consequential.",category:"Human Feats",significance:"Local or one-off",confidence:"Well established",source_name:"(placeholder)",source_url:"#"},
  {headline:"A river was granted legal rights to be protected",summary:"A jurisdiction recognized a river as a legal entity whose health can be defended in court.",basis:"Enacted legal instrument.",caveat:"Rights on paper; enforcement and standing in practice remain to be tested.",category:"Environment",significance:"Notable but early",confidence:"Moderate",source_name:"(placeholder)",source_url:"#"}
 ];
@@ -146,7 +148,7 @@ function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";
 function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
 function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"How sure we are \u2014 strong, settled evidence: official data or a confirmed finding.";if(s.includes("moderate"))return"How sure we are \u2014 credible, but with some open questions.";return"How sure we are \u2014 preliminary: a single study or early figures, not yet confirmed.";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const VERSION="v0.5.3", BUILD="2026-06-03";
+const VERSION="v0.6.0", BUILD="2026-06-04";
 function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
 const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
 const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
@@ -169,26 +171,29 @@ function niceHeadline(h,src){
 
 function renderFilters(){
   const f=document.getElementById("filters");
-  const cats=["All",...CATEGORIES.filter(c=>ALL.some(s=>s.category===c))];
+  const hasPick=ALL.some(s=>s.curated);
+  const cats=["All",...(hasPick?[PICKS]:[]),...CATEGORIES.filter(c=>ALL.some(s=>s.category===c))];
   f.innerHTML=cats.map(c=>`<button class="pill${c===ACTIVE?' pill-on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join("")+`<button class="refresh" id="refresh">&#8635; Refresh</button>`;
   f.querySelectorAll(".pill").forEach(b=>b.addEventListener("click",()=>{ACTIVE=b.getAttribute("data-c");renderFilters();renderCards();}));
   document.getElementById("refresh").addEventListener("click",loadFeed);
 }
 function renderCards(){
   const c=document.getElementById("content");
-  const items=ACTIVE==="All"?ALL:ALL.filter(s=>s.category===ACTIVE);
+  const items=ACTIVE===PICKS?ALL.filter(s=>s.curated):(ACTIVE==="All"?ALL:ALL.filter(s=>s.category===ACTIVE));
   if(!items.length){c.innerHTML='<div class="loading"><p>Nothing here yet.</p></div>';return;}
   c.innerHTML='<div class="grid">'+items.map(s=>{
     const verified=(s.verification||"").toLowerCase().includes("verif");
     const vfTip=verified?"Passed our second source check \u2014 a reputable source directly states this and the claim held up. It's a source check, not an independent fact-check, so confirm anything important at the link.":"Properly sourced, but flagged \u2014 the claim is early, limited in scope, or has open questions. Read it with a grain of salt.";
     const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?`<span class="badge ok has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Verified. ${esc(vfTip)}">\u2713 Verified</span>`:`<span class="badge caution has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Caution. ${esc(vfTip)}">\u25B3 Caution</span>`);
+    const pickTip="Hand-picked by a Lobs editor from a reputable outlet \u2014 separate from the automated feed. The verification layer still applies.";
+    const pickBadge=s.curated?`<span class="badge pick has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(pickTip)}" aria-label="Editor's Pick. ${esc(pickTip)}">\u2605 Editor's Pick</span>`:"";
     const dh=niceHeadline(s.headline,s.source_name);
     const hasLink=s.source_url&&s.source_url!=="#";
     const hl=hasLink?`<a href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(dh)}</a>`:esc(dh);
     const sigV=s.significance||"", confV=s.confidence||"";
     const sigSpan=sigV?`<span class="sig has-tip ${sigCls(sigV)}" tabindex="0" role="note" data-tip="${esc(sigHelp(sigV))}" aria-label="Significance \u2014 ${esc(sigV)}. ${esc(sigHelp(sigV))}">${esc(sigV)}</span>`:"";
     const confSpan=confV?`<span class="conf has-tip" tabindex="0" role="note" data-tip="${esc(confHelp(confV))}" aria-label="Confidence \u2014 ${esc(confV)}. ${esc(confHelp(confV))}"><span class="dot ${confCls(confV)}"></span>${esc(confV)}</span>`:"";
-    return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span>${badge}</div>
+    return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span><span class="bgroup">${pickBadge}${badge}</span></div>
       <h2 class="hl">${hl}</h2>
       ${s.basis?`<p class="basis"><span class="lbl">What backs it</span>${esc(s.basis)}</p>`:""}
       ${s.caveat?`<p class="caveat"><span class="lbl lbl-c">What it doesn't mean</span>${esc(s.caveat)}</p>`:""}
