@@ -2,44 +2,50 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Lobs News — Look on the Bright Side</title>
+<title>Goodlede — Look on the Bright Side</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
-:root{--paper:#F6F2E9;--paper-2:#EFEADD;--ink:#221E18;--ink-soft:#5A5248;--line:#D8CFBC;--green:#2F5D3A;--clay:#8A4B33;--gold:#9A7B33;}
-*{box-sizing:border-box;}
-body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.5;background:radial-gradient(120% 80% at 80% -10%,#FBF8F1 0%,rgba(251,248,241,0) 60%),var(--paper);min-height:100vh;padding:34px 22px 48px;}
-.wrap{max-width:1080px;margin:0 auto;}
-.wordmark{display:flex;align-items:baseline;gap:10px;}
+:root{--paper:#F5F0E6;--paper-2:#EBE5D6;--ink:#1C1810;--ink-soft:#58503F;--line:#D6CBB5;--blue:#2B4B78;--blue-soft:rgba(43,75,120,.11);--amber:#8F6115;--amber-soft:rgba(143,97,21,.12);}
+*{box-sizing:border-box;max-width:100%;}svg,img,video{max-width:100%;height:auto;}
+input,button,select,textarea{max-width:none;}
+.has-tip::after{max-width:min(260px,80vw);}
+.share-menu{max-width:none;}
+html{overflow-x:hidden;}body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.5;background:radial-gradient(120% 80% at 80% -10%,#FBF8F1 0%,rgba(251,248,241,0) 60%),var(--paper);min-height:100vh;padding:34px 22px 48px;overflow-x:clip;}
+.wrap{max-width:1080px;margin:0 auto;width:100%;}
+.wordmark{display:flex;align-items:baseline;gap:0;}
 .mark{font-family:'Fraunces',serif;font-weight:600;font-size:42px;letter-spacing:-.5px;}
-.mark2{color:var(--green);}
-.subhead{font-family:'Fraunces',serif;font-weight:400;font-style:italic;font-size:22px;color:var(--clay);margin:6px 0 0;}
+.mark2{color:var(--blue);}
+.subhead{font-family:'Fraunces',serif;font-weight:400;font-style:italic;font-size:22px;color:var(--amber);margin:6px 0 0;}
 .subhead .ac{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;}
 .subhead .the{font-style:normal;font-size:.66em;color:var(--ink-soft);opacity:.8;}
 .lead{font-family:'Fraunces',serif;font-weight:400;font-size:20px;line-height:1.45;color:var(--ink);margin:14px 0 0;max-width:720px;}
-.daily{font-size:13px;color:var(--green);font-weight:500;letter-spacing:.4px;text-transform:uppercase;margin:12px 0 0;}
+.daily{font-size:13px;color:var(--blue);font-weight:500;letter-spacing:.4px;text-transform:uppercase;margin:12px 0 0;}
 .rule{height:2px;background:var(--ink);margin:16px 0 12px;}
-.standard{font-size:15px;color:var(--ink-soft);margin:0;max-width:820px;} .standard em{color:var(--clay);font-style:italic;}
-.banner{margin:18px 0 4px;padding:10px 14px;border:1px solid var(--gold);border-radius:4px;background:rgba(154,123,51,.1);color:var(--gold);font-size:14px;}
+.standard{font-size:15px;color:var(--ink-soft);margin:0;max-width:100%;} .standard em{color:var(--amber);font-style:italic;}
+.banner{margin:18px 0 4px;padding:10px 14px;border:1px solid var(--amber);border-radius:4px;background:rgba(154,123,51,.1);color:var(--amber);font-size:14px;}
 .filters{margin:22px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
 .pill{font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;transition:all .15s;}
-.pill:hover{border-color:var(--ink);color:var(--ink);} .pill-on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
-.refresh{margin-left:auto;font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border:1px solid var(--green);color:var(--green);background:transparent;border-radius:999px;cursor:pointer;} .refresh:hover{background:var(--green);color:var(--paper);}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;}
+.pill:hover{border-color:var(--ink);color:var(--ink);} .pill.pill-on,.pill.pill-on:hover{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.refresh{margin-left:auto;font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border:1px solid var(--blue);color:var(--blue);background:transparent;border-radius:999px;cursor:pointer;} .refresh:hover{background:var(--blue);color:var(--paper);}
+.grid>.card:first-child{grid-column:1/-1;}.grid>.card:first-child .hl{font-size:27px;line-height:1.18;}.grid>.card:first-child .basis,.grid>.card:first-child .caveat{font-size:14.5px;}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;}
 .card{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:20px 20px 16px;display:flex;flex-direction:column;}
 .ctop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
 .bgroup{display:flex;gap:6px;align-items:center;flex-shrink:0;}
 .cat{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
 .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;font-weight:500;}
-.ok{background:rgba(47,93,58,.14);color:var(--green);} .caution{background:rgba(154,123,51,.18);color:var(--gold);} .sample{background:rgba(90,82,72,.12);color:var(--ink-soft);} .pick{background:rgba(138,75,51,.14);color:var(--clay);}
+.ok{background:rgba(43,75,120,.11);color:var(--blue);} .caution{background:rgba(143,97,21,.12);color:var(--amber);} .sample{background:rgba(90,82,72,.12);color:var(--ink-soft);} .pick{background:rgba(88,80,63,.10);color:var(--amber);}
 .hl{font-family:'Fraunces',serif;font-weight:500;font-size:22px;line-height:1.2;margin:0 0 8px;}
-.hl a{color:inherit;text-decoration:none;} .hl a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--green);}
+.hl a{color:inherit;text-decoration:none;} .hl a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--blue);}
 .sum{font-size:16px;margin:0 0 12px;} .basis,.caveat{font-size:14px;margin:0 0 10px;}
-.lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);font-weight:500;margin-bottom:2px;} .lbl-c{color:var(--clay);}
-.caveat{color:var(--ink-soft);font-style:italic;border-left:2px solid var(--clay);padding-left:11px;}
-.meta{display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 8px;align-items:center;}
-.sig{font-size:11px;padding:2px 9px;border-radius:999px;} .s-strong{background:rgba(47,93,58,.13);color:var(--green);}.s-mid{background:rgba(154,123,51,.16);color:var(--gold);}.s-soft{background:rgba(90,82,72,.1);color:var(--ink-soft);}
-.conf{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft);} .dot{width:9px;height:9px;border-radius:50%;display:inline-block;} .d-strong{background:var(--green);}.d-mid{background:var(--gold);}.d-soft{background:#B9AE98;}
+.lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue);font-weight:500;margin-bottom:2px;} .lbl-c{color:var(--amber);}
+.caveat{color:var(--ink-soft);font-style:italic;border-left:2px solid var(--amber);padding-left:11px;}
+.byline{font-size:13px;color:var(--ink-soft);margin:0 0 8px;}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px;align-items:center;line-height:1;}
+.sig{font-size:11px;padding:3px 10px;border-radius:999px;line-height:1.4;display:inline-flex;align-items:center;} .s-strong{background:rgba(43,75,120,.11);color:var(--blue);}.s-mid{background:rgba(143,97,21,.12);color:var(--amber);}.s-soft{background:rgba(90,82,72,.1);color:var(--ink-soft);}
+.conf{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-soft);} .dot{width:9px;height:9px;border-radius:50%;display:inline-block;} .d-strong{background:var(--blue);}.d-mid{background:var(--amber);}.d-soft{background:#B9AE98;}
 .has-tip{position:relative;cursor:help;}
 .has-tip:focus{outline:none;}
 .has-tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 9px);width:max-content;max-width:min(260px,80vw);white-space:normal;background:var(--ink);color:var(--paper);font-size:12px;line-height:1.4;font-style:normal;text-transform:none;letter-spacing:normal;text-align:left;padding:8px 11px;border-radius:6px;box-shadow:0 8px 22px rgba(0,0,0,.20);opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .12s ease,transform .12s ease;z-index:30;pointer-events:none;}
@@ -58,25 +64,40 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 .sitefoot a:hover{color:var(--ink);}
 .src{font-size:13px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);} .src:hover{border-color:var(--ink);}
 .loading{margin:60px auto;text-align:center;color:var(--ink-soft);font-size:17px;}
-.spin{width:30px;height:30px;border:2px solid var(--line);border-top-color:var(--green);border-radius:50%;margin:0 auto 16px;animation:sp .8s linear infinite;} @keyframes sp{to{transform:rotate(360deg);}}
+.spin{width:30px;height:30px;border:2px solid var(--line);border-top-color:var(--blue);border-radius:50%;margin:0 auto 16px;animation:sp .8s linear infinite;} @keyframes sp{to{transform:rotate(360deg);}}
 .note{margin:30px auto 0;font-size:13px;color:var(--ink-soft);font-style:italic;text-align:center;}
 .subscribe{max-width:480px;margin:36px auto 0;text-align:center;border-top:1px solid var(--line);padding-top:24px;}
 .subscribe p{font-family:'Fraunces',serif;font-size:18px;color:var(--ink);margin:0 0 12px;}
 .subrow{display:flex;gap:8px;}
-.subrow input{flex:1;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);} .subrow input:focus{outline:none;border-color:var(--green);}
-.subrow button{font-family:'Newsreader',serif;font-size:16px;padding:10px 18px;border:1px solid var(--green);background:var(--green);color:var(--paper);border-radius:4px;cursor:pointer;}
+.subrow input{flex:1;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);} .subrow input:focus{outline:none;border-color:var(--blue);}
+.subrow button{font-family:'Newsreader',serif;font-size:16px;padding:10px 18px;border:1px solid var(--blue);background:var(--blue);color:var(--paper);border-radius:4px;cursor:pointer;}
 .submsg{margin-top:10px;font-size:14px;min-height:18px;}
 /* gate */
 .gate{max-width:460px;margin:8vh auto 0;text-align:center;} .gate .wordmark{justify-content:center;}
 .gate-card{margin-top:26px;background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:26px 24px;}
 .gate-card p{margin:0 0 16px;color:var(--ink-soft);font-size:15px;}
 .gate-row{display:flex;gap:8px;}
-.gate-row input{flex:1;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);} .gate-row input:focus{outline:none;border-color:var(--green);}
-.gate-row button{font-family:'Newsreader',serif;font-size:16px;padding:10px 18px;border:1px solid var(--green);background:var(--green);color:var(--paper);border-radius:4px;cursor:pointer;} .gate-row button:hover{background:#264c30;}
-.gate-msg{margin-top:12px;font-size:14px;min-height:20px;} .gate-err{color:var(--clay);} .gate-ok{color:var(--green);}
-.gate-notify{margin-top:14px;font-family:'Newsreader',serif;font-size:15px;padding:8px 16px;border:1px solid var(--green);background:transparent;color:var(--green);border-radius:4px;cursor:pointer;} .gate-notify:hover{background:var(--green);color:var(--paper);}
+.gate-row input{flex:1;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);} .gate-row input:focus{outline:none;border-color:var(--blue);}
+.gate-row button{font-family:'Newsreader',serif;font-size:16px;padding:10px 18px;border:1px solid var(--blue);background:var(--blue);color:var(--paper);border-radius:4px;cursor:pointer;} .gate-row button:hover{background:#1e3557;}
+.gate-msg{margin-top:12px;font-size:14px;min-height:20px;} .gate-err{color:var(--amber);} .gate-ok{color:var(--blue);}
+.gate-notify{margin-top:14px;font-family:'Newsreader',serif;font-size:15px;padding:8px 16px;border:1px solid var(--blue);background:transparent;color:var(--blue);border-radius:4px;cursor:pointer;} .gate-notify:hover{background:var(--blue);color:var(--paper);}
 .gate-row input,.subrow input{min-width:0;}
 .gate-row button,.subrow button{flex-shrink:0;white-space:nowrap;}
+@media (max-width:600px){
+  /* Remove stacking horizontal paddings — body's 16px is enough */
+  .grid{padding-left:0;padding-right:0;grid-template-columns:1fr;}
+  .featured-wrap{padding-left:0;padding-right:0;}
+  .featured{grid-template-columns:1fr;}
+  /* First card: don't make it massive on small screens */
+  .grid>.card:first-child .hl{font-size:22px;line-height:1.2;}
+  /* Refresh button: don't auto-margin on mobile (causes odd floating) */
+  .refresh{margin-left:0;width:100%;}
+  /* Badges: allow wrapping */
+  .ctop{flex-wrap:wrap;}
+  /* Donate modal */
+  .donate-amts{gap:6px;}
+  .da{font-size:14px;padding:6px 14px;}
+}
 @media (max-width:520px){
   body{padding-left:16px;padding-right:16px;}
   .gate-row,.subrow{flex-wrap:wrap;}
@@ -86,32 +107,41 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
 .site{max-width:760px;margin:48px auto 0;border-top:2px solid var(--ink);padding-top:24px;text-align:center;}
 .site-sub p{font-family:'Fraunces',serif;font-size:18px;color:var(--ink);margin:0 0 12px;}
 .site-sub .subrow{max-width:440px;margin:0 auto;}
-.site-links{margin-top:22px;font-size:13px;color:var(--ink-soft);}
+.site-links{margin-top:22px;font-size:13px;color:var(--ink-soft);display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0;}
 .site-links a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--line);} .site-links a:hover{color:var(--ink);}
 .site-links .sep{margin:0 9px;color:var(--line);}
 .ver{color:var(--ink-soft);opacity:.65;}
 .hidden{display:none;}
+
+/* ── Donate ── */
+.donate-wrap{max-width:560px;margin:36px auto 0;border-top:1px solid var(--line);padding-top:28px;text-align:center;}
+.donate-head{font-family:'Fraunces',serif;font-weight:500;font-size:20px;color:var(--ink);margin-bottom:6px;}
+.donate-sub{font-size:14px;color:var(--ink-soft);margin-bottom:20px;line-height:1.5;}
+.donate-toggle{display:inline-flex;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:18px;}
+.donate-toggle button{font-family:'Newsreader',serif;font-size:13px;padding:5px 18px;border:none;border-radius:999px;background:transparent;color:var(--ink-soft);cursor:pointer;}
+.donate-toggle button.dt-on{background:var(--blue);color:var(--paper);}
+.donate-amts{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:12px;}
+.da{font-family:'Newsreader',serif;font-size:15px;padding:7px 18px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--ink);cursor:pointer;}
+.da:hover{border-color:var(--blue);color:var(--blue);}
+.da.da-on{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:500;}
+.donate-custom-row{margin-bottom:14px;display:none;}
+.donate-custom-row input{width:120px;font-family:'Newsreader',serif;font-size:17px;padding:8px 10px;border:1px solid var(--blue);border-radius:4px;background:#FDFAF5;color:var(--ink);text-align:center;}
+.donate-custom-row input:focus{outline:none;}
+.donate-btn-row{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.donate-btn{font-family:'Newsreader',serif;font-size:16px;padding:11px 36px;background:var(--blue);color:var(--paper);border:none;border-radius:4px;cursor:pointer;}
+.donate-btn:hover{background:var(--blue-dark, #1e3557);}
+.donate-note{font-size:12px;color:var(--ink-faint);}
+.donate-msg{font-size:14px;min-height:18px;}
+.donate-msg.ok{color:var(--blue);} .donate-msg.err{color:var(--amber);}
 </style>
 </head>
 <body>
 
-<div class="gate" id="gate">
-  <div class="wordmark"><span class="mark">Lobs</span><span class="mark mark2">News</span></div>
-  <p class="subhead"><span class="ac">L</span>ook <span class="ac">O</span>n <span class="the">the</span> <span class="ac">B</span>right <span class="ac">S</span>ide</p>
-  <div class="gate-card">
-    <p>Private beta. Enter your approved email to read.</p>
-    <div class="gate-row"><input id="email" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email"/><button id="enter">Enter</button></div>
-    <div class="gate-msg" id="gateMsg"></div>
-    <button id="notifyBtn" class="hidden gate-notify">Notify me when it opens</button>
-  </div>
-  <div class="sitefoot"><a href="privacy.html">Privacy</a> &middot; <a href="tos.html">Terms</a> &middot; <a href="contact.html">Contact</a> &middot; <span class="ver" id="verGate"></span></div>
-</div>
-
-<div class="wrap hidden" id="app">
-  <div class="wordmark"><span class="mark">Lobs</span><span class="mark mark2">News</span></div>
-  <p class="subhead"><span class="ac">L</span>ook <span class="ac">O</span>n <span class="the">the</span> <span class="ac">B</span>right <span class="ac">S</span>ide</p>
+<div class="wrap" id="app">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:8px;"><div><a href="/" style="text-decoration:none;"><div class="wordmark"><span class="mark">Good</span><span class="mark mark2">lede</span></div></a>
+  <p class="subhead">Look on the Bright Side</p></div><span class="daily" id="dateline"></span></div>
   <p class="lead">Good things are happening all the time, but bad news travels faster. Come on in and read about some of the positivity out there today.</p>
-  <p class="daily">&#8635; Refreshed every morning</p>
+  <p class="daily">&#8635; Refreshed daily</p>
   <div class="rule"></div>
   <p class="standard">The good that's easy to miss, from anywhere in the world &mdash; the environment and the creatures in it, people being good to each other, science and health that helps, hard-won human feats, real progress on fairness, and the small player beating the giant. No politics. Two checks before anything appears: one finds it, a second re-verifies it against a reputable source and throws out whatever&rsquo;s overblown or unproven. What&rsquo;s left says what happened, what backs it, and <em>what it doesn&rsquo;t mean.</em></p>
   <div id="banner"></div>
@@ -124,13 +154,16 @@ body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'N
       <div class="subrow"><input id="subEmail" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email"/><button id="subBtn">Subscribe</button></div>
       <div class="submsg" id="subMsg"></div>
     </div>
-    <div class="site-links"><a href="privacy.html">Privacy</a><span class="sep">&middot;</span><a href="tos.html">Terms</a><span class="sep">&middot;</span><a href="contact.html">Contact</a><span class="sep">&middot;</span><span class="ver" id="ver"></span></div>
+    <div class="site-links"><a href="privacy.html">Privacy</a><span class="sep">&middot;</span><a href="tos.html">Terms</a><span class="sep">&middot;</span><a href="about.html">About</a><span class="sep">&middot;</span><a href="contact.html">Contact</a><span class="sep">&middot;</span><a href="#" onclick="openDonate();return false;" style="color:var(--blue);font-weight:500;border-bottom:1px solid var(--blue);">Donate</a><span class="sep">&middot;</span><span class="ver" id="ver"></span><span class="sep">&middot;</span><span style="color:var(--ink-faint);">&copy; 2026 Wag Media, LLC</span></div>
   </footer>
 </div>
 
 <script>
-const FUNCTIONS_BASE = "https://wfpokgexkjumsbnwcxfo.functions.supabase.co";
-const CATEGORIES=["Environment","Animals","Kindness","Science & Health","Human Feats","Equality","David vs Goliath"];
+if(window.location.hostname==="lobsnews.com"||window.location.hostname==="www.lobsnews.com"){window.location.replace("https://goodlede.com"+window.location.pathname+window.location.search);}
+const SITE_URL = "https://goodlede.com";
+const STRIPE_PK = "pk_live_51TewFJRhZ6nPTqXmZSHtbF6rnJvnPkJm5nSMsReMOQtoGL1M8xcac3pVoxRTrLW1Livsh75lEc9RrguA1jkAiR1D00q07sRDyI";
+const FUNCTIONS_BASE = "https://qvmewmebcrkmyutvbzxv.functions.supabase.co";
+const CATEGORIES=["Environment","Animals","Kindness","Science","Health","Human Feats","Equality","Legal","David vs Goliath"];
 const PICKS="\u2605 Editor's Picks";
 
 const SAMPLES=[
@@ -148,7 +181,8 @@ function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";
 function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
 function confHelp(v=""){const s=v.toLowerCase();if(s.includes("well"))return"How sure we are \u2014 strong, settled evidence: official data or a confirmed finding.";if(s.includes("moderate"))return"How sure we are \u2014 credible, but with some open questions.";return"How sure we are \u2014 preliminary: a single study or early figures, not yet confirmed.";}
 function esc(x){return String(x||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-const VERSION="v0.6.0", BUILD="2026-06-04";
+const VERSION="v2.0.0", BUILD="2026-06-04";
+function setDateline(){var d=new Date();var el=document.getElementById("dateline");if(el)el.textContent=d.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});}
 function setVersion(){const t=VERSION+" \u00b7 "+BUILD;["ver","verGate"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
 const HL_SMALL=new Set(["a","an","and","the","of","to","in","on","for","or","but","as","at","by","vs","with","from","into","over"]);
 const HL_ACR=new Set(["UN","US","USA","UK","EU","UAE","WWF","WHO","NASA","NATO","UNESCO","UNICEF","IFAW","JGI","FDA","EPA","NHS","RNZ","BBC","CNN","NGO","CO2","AI","DNA","RNA","HIV","AIDS","UV","GDP","IUCN","WCS","ASCO","PFAS","LGBTQ","EV","II","III","IV"]);
@@ -185,7 +219,7 @@ function renderCards(){
     const verified=(s.verification||"").toLowerCase().includes("verif");
     const vfTip=verified?"Passed our second source check \u2014 a reputable source directly states this and the claim held up. It's a source check, not an independent fact-check, so confirm anything important at the link.":"Properly sourced, but flagged \u2014 the claim is early, limited in scope, or has open questions. Read it with a grain of salt.";
     const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?`<span class="badge ok has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Verified. ${esc(vfTip)}">\u2713 Verified</span>`:`<span class="badge caution has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Caution. ${esc(vfTip)}">\u25B3 Caution</span>`);
-    const pickTip="Hand-picked by a Lobs editor from a reputable outlet \u2014 separate from the automated feed. The verification layer still applies.";
+    const pickTip="Hand-picked by a Goodlede editor from a reputable outlet \u2014 separate from the automated feed. The verification layer still applies.";
     const pickBadge=s.curated?`<span class="badge pick has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(pickTip)}" aria-label="Editor's Pick. ${esc(pickTip)}">\u2605 Editor's Pick</span>`:"";
     const dh=niceHeadline(s.headline,s.source_name);
     const hasLink=s.source_url&&s.source_url!=="#";
@@ -193,59 +227,49 @@ function renderCards(){
     const sigV=s.significance||"", confV=s.confidence||"";
     const sigSpan=sigV?`<span class="sig has-tip ${sigCls(sigV)}" tabindex="0" role="note" data-tip="${esc(sigHelp(sigV))}" aria-label="Significance \u2014 ${esc(sigV)}. ${esc(sigHelp(sigV))}">${esc(sigV)}</span>`:"";
     const confSpan=confV?`<span class="conf has-tip" tabindex="0" role="note" data-tip="${esc(confHelp(confV))}" aria-label="Confidence \u2014 ${esc(confV)}. ${esc(confHelp(confV))}"><span class="dot ${confCls(confV)}"></span>${esc(confV)}</span>`:"";
+    const pubDateStr=s.pub_date||(s.first_seen?s.first_seen.slice(0,10):null);
+    const dateLabel=pubDateStr?new Date(pubDateStr+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'';
+    const authorLabel=s.author?'By '+esc(s.author):'';
+    const byline=(authorLabel||dateLabel)?`<div class="byline">${[authorLabel,dateLabel].filter(Boolean).join(' \u00b7 ')}</div>`:'';
     return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span><span class="bgroup">${pickBadge}${badge}</span></div>
       <h2 class="hl">${hl}</h2>
+      ${byline}
       ${s.basis?`<p class="basis"><span class="lbl">What backs it</span>${esc(s.basis)}</p>`:""}
       ${s.caveat?`<p class="caveat"><span class="lbl lbl-c">What it doesn't mean</span>${esc(s.caveat)}</p>`:""}
       <div class="meta">${sigSpan}${confSpan}</div>
-      ${s.check_note?`<p style="font-size:12px;color:var(--ink-soft);margin:0 0 4px;">Checked &mdash; ${esc(s.check_note)}</p>`:""}
-      <div class="foot"><button class="share-btn" data-h="${esc(dh)}" data-u="${esc(s.source_url||"")}">Share</button>${hasLink?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>';
+
+      <div class="foot"><button class="share-btn" data-h="${esc(dh)}" data-u="${SITE_URL}/story/${esc(s.id)}">Share</button>${hasLink?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>';
 }
 function render(items,isSample){ALL=items;IS_SAMPLE=isSample;ACTIVE="All";renderFilters();renderCards();}
-function showApp(){document.getElementById("gate").classList.add("hidden");document.getElementById("app").classList.remove("hidden");wireSubscribe();}
+function showApp(){var g=document.getElementById("gate");if(g)g.classList.add("hidden");document.getElementById("app").classList.remove("hidden");wireSubscribe();}
 
 async function fetchFeed(email){
-  const r=await fetch(`${FUNCTIONS_BASE}/lobs-feed`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  const r=await fetch(`${FUNCTIONS_BASE}/goodlede-feed`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
   if(r.status===403) return {ok:false,reason:"not_approved"};
   if(!r.ok) throw new Error("feed "+r.status);
   const d=await r.json(); return {ok:true,stories:d.stories||[]};
 }
 async function subscribe(email){
-  const r=await fetch(`${FUNCTIONS_BASE}/lobs-subscribe`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+  const r=await fetch(`${FUNCTIONS_BASE}/goodlede-subscribe`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
   return r.ok;
 }
 
 async function loadFeed(){
-  document.getElementById("content").innerHTML='<div class="loading"><div class="spin"></div><p>Loading the latest\u2026</p></div>';
+  document.getElementById("content").innerHTML='<div class="loading"><div class="spin"></div><p>Loading the latest...</p></div>';
   document.getElementById("banner").innerHTML="";
-  const email=localStorage.getItem("lobs_email");
-  if(!email){ render(SAMPLES,true); return; }
   try{
-    const res=await fetchFeed(email);
-    if(!res.ok){ localStorage.removeItem("lobs_email"); location.reload(); return; }
-    if(!res.stories.length){ document.getElementById("content").innerHTML='<div class="loading"><p>No stories yet \u2014 the daily run will populate this shortly.</p></div>'; return; }
-    render(res.stories,false);
-    document.getElementById("note").innerHTML="Each item survived a second-pass source check \u2014 still, verify anything that matters against the link.";
+    const r=await fetch(FUNCTIONS_BASE+"/goodlede-feed",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    if(!r.ok) throw new Error("feed "+r.status);
+    const d=await r.json();
+    if(!d.stories||!d.stories.length){ document.getElementById("content").innerHTML='<div class="loading"><p>No stories yet — check back soon.</p></div>'; return; }
+    render(d.stories,false);
+    document.getElementById("note").innerHTML="Each item survived a second-pass source check — still, verify anything that matters against the link.";
   }catch(e){
-    document.getElementById("banner").innerHTML='<div class="banner">Couldn\u2019t reach the feed ('+esc(e.message)+'). Showing sample layout.</div>';
+    document.getElementById("banner").innerHTML='<div class="banner">Couldn\'t reach the feed ('+esc(e.message)+'). Showing sample layout.</div>';
     render(SAMPLES,true);
   }
 }
 
-function setMsg(t,cls){const m=document.getElementById("gateMsg");m.textContent=t;m.className="gate-msg "+(cls||"");}
-async function tryEnter(){
-  const email=document.getElementById("email").value.trim().toLowerCase();
-  LAST_EMAIL=email;
-  if(!email||!email.includes("@")){setMsg("Enter a valid email.","gate-err");return;}
-  setMsg("Checking\u2026","");
-  document.getElementById("notifyBtn").classList.add("hidden");
-  try{
-    const res=await fetchFeed(email);
-    if(!res.ok){ setMsg("\u201C"+email+"\u201D isn\u2019t on the beta list yet \u2014 want updates when we open up?","gate-err"); document.getElementById("notifyBtn").classList.remove("hidden"); return; }
-    localStorage.setItem("lobs_email",email); showApp(); render(res.stories,false);
-    document.getElementById("note").innerHTML="Each item survived a second-pass source check \u2014 still, verify anything that matters against the link.";
-  }catch(e){ setMsg("Something went wrong. Try again.","gate-err"); }
-}
 function wireSubscribe(){
   const btn=document.getElementById("subBtn"); if(!btn||btn.dataset.wired) return; btn.dataset.wired="1";
   btn.addEventListener("click", async ()=>{
@@ -257,47 +281,170 @@ function wireSubscribe(){
   });
 }
 
-document.getElementById("enter").addEventListener("click",tryEnter);
-document.getElementById("email").addEventListener("keydown",e=>{if(e.key==="Enter")tryEnter();});
-document.getElementById("notifyBtn").addEventListener("click", async ()=>{
-  const m=document.getElementById("gateMsg");
-  try{ const ok=await subscribe(LAST_EMAIL); m.textContent=ok?"Thanks \u2014 we\u2019ll be in touch.":"Try again."; m.className="gate-msg "+(ok?"gate-ok":"gate-err"); if(ok) document.getElementById("notifyBtn").classList.add("hidden"); }
-  catch(_){ m.textContent="Try again."; m.className="gate-msg gate-err"; }
-});
 
-function closeShareMenus(){ document.querySelectorAll(".share-menu").forEach(el=>el.remove()); }
-function buildShareMenu(h,u){
-  const url=u||"https://lobsnews.com"; const text=h+" \u2014 via Lobs News"; const enc=encodeURIComponent;
-  const menu=document.createElement("div"); menu.className="share-menu";
-  menu.innerHTML=
-    `<a href="https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}" target="_blank" rel="noreferrer">Share on X</a>`+
-    `<a href="https://www.facebook.com/sharer/sharer.php?u=${enc(url)}" target="_blank" rel="noreferrer">Share on Facebook</a>`+
-    `<a href="https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}" target="_blank" rel="noreferrer">Share on LinkedIn</a>`+
-    `<a href="mailto:?subject=${enc(h)}&body=${enc(text+"\n\n"+url)}">Email</a>`+
-    `<button type="button" data-copy="${esc(url)}">Copy link</button>`;
-  return menu;
+let _dType='once', _dAmt=5;
+function setDType(t){
+  _dType=t;
+  document.getElementById('dt-once').classList.toggle('dt-on',t==='once');
+  document.getElementById('dt-monthly').classList.toggle('dt-on',t==='monthly');
+  updDonateBtn();
 }
-document.addEventListener("click",(e)=>{
-  const btn=e.target.closest(".share-btn");
-  if(btn){
-    e.stopPropagation();
-    const h=btn.dataset.h||"", u=btn.dataset.u||"";
-    if(navigator.share){ navigator.share({title:h,text:h+" \u2014 via Lobs News",url:u||"https://lobsnews.com"}).catch(()=>{}); return; }
-    const open=btn.parentElement.querySelector(".share-menu"); closeShareMenus();
-    if(open) return;
-    btn.parentElement.appendChild(buildShareMenu(h,u)); return;
+function setDA(a){
+  document.querySelectorAll('.da').forEach(b=>b.classList.remove('da-on'));
+  const cr=document.getElementById('donate-custom-row');
+  if(a==='custom'){
+    document.getElementById('da-custom').classList.add('da-on');
+    cr.style.display='block'; _dAmt=null;
+  } else {
+    document.querySelectorAll('.da:not(#da-custom)').forEach(b=>{if(b.textContent.trim()==='$'+a)b.classList.add('da-on');});
+    cr.style.display='none'; _dAmt=a;
   }
-  const copyBtn=e.target.closest(".share-menu button[data-copy]");
-  if(copyBtn){
-    e.stopPropagation();
-    const v=copyBtn.getAttribute("data-copy");
-    if(navigator.clipboard){ navigator.clipboard.writeText(v).then(()=>{ copyBtn.textContent="Copied!"; setTimeout(closeShareMenus,800); }).catch(()=>{ copyBtn.textContent="Copy failed"; }); }
-    return;
-  }
-  if(!e.target.closest(".share-menu")) closeShareMenus();
-});
+  updDonateBtn();
+}
+function updDonateBtn(){
+  const a=_dAmt||(parseFloat(document.getElementById('donate-custom-val')?.value)||null);
+  const label=a?'$'+a:'an amount';
+  const suffix=_dType==='monthly'?'/month':' once';
+  document.getElementById('donate-btn').textContent='Donate '+label+suffix;
+  document.getElementById('donate-note').textContent=_dType==='monthly'?'Monthly \u00b7 cancel anytime \u00b7 Secure via Stripe':'Secure checkout via Stripe. No account required.';
+}
+document.getElementById('donate-custom-val')?.addEventListener('input',updDonateBtn);
+async function doDonate(){
+  const a=_dAmt||(parseFloat(document.getElementById('donate-custom-val')?.value)||0);
+  if(!a||a<1){const m=document.getElementById('donate-msg');m.textContent='Enter an amount ($1 minimum).';m.className='donate-msg err';return;}
+  const btn=document.getElementById('donate-btn');
+  const msg=document.getElementById('donate-msg');
+  btn.disabled=true; btn.textContent='Redirecting...'; msg.textContent='';
+  try{
+    const r=await fetch(FUNCTIONS_BASE+'/goodlede-donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount_cents:Math.round(a*100),type:_dType})});
+    const d=await r.json();
+    if(d.ok&&d.url){window.location.href=d.url;}
+    else{msg.textContent=d.error||'Something went wrong.';msg.className='donate-msg err';btn.disabled=false;updDonateBtn();}
+  }catch(e){msg.textContent='Could not reach payment server.';msg.className='donate-msg err';btn.disabled=false;updDonateBtn();}
+}
+// Thank-you message after Stripe redirect
+if(new URLSearchParams(location.search).get('donated')==='true'){
+  history.replaceState({},'',location.pathname);
+  document.addEventListener('DOMContentLoaded',()=>{
+    const s=document.getElementById('donate-section');
+    if(s){var d=document.createElement("div");d.style.cssText="padding:24px;text-align:center;color:#2B4B78;font-family:Georgia,serif;font-size:18px;";d.textContent="Thank you for supporting Goodlede. ";s.innerHTML="";s.appendChild(d);}
+  });
+}
+function openDonate(){var m=document.getElementById("donate-modal");if(m)m.style.display="flex";}
+function closeDonate(){var m=document.getElementById("donate-modal");if(m)m.style.display="none";}
+(function(){var m=document.getElementById("donate-modal");if(m)m.addEventListener("click",function(e){if(e.target===m)closeDonate();});})();
+(function(){var o=localStorage.getItem("lobs_email");if(o&&!localStorage.getItem("goodlede_email")){localStorage.setItem("goodlede_email",o);localStorage.removeItem("lobs_email");}})();
 
-(function init(){ setVersion(); const saved=localStorage.getItem("lobs_email"); if(saved){ showApp(); loadFeed(); } })();
+function wireSharing(){
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.share-menu')&&!e.target.closest('.share-btn')){
+      document.querySelectorAll('.share-menu').forEach(function(m){m.remove();});
+    }
+    var btn=e.target.closest('.share-btn');
+    if(!btn) return;
+    e.stopPropagation();
+    document.querySelectorAll('.share-menu').forEach(function(m){m.remove();});
+    var h=btn.dataset.h, u=btn.dataset.u;
+    var isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    if(isMobile&&navigator.share){navigator.share({title:h,url:u}).catch(function(){});return;}
+    var menu=document.createElement('div');
+    menu.className='share-menu';
+    var copyBtn=document.createElement('button');
+    copyBtn.textContent='Copy link';
+    copyBtn.addEventListener('click',function(){
+      (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){
+        copyBtn.textContent='Copied!';setTimeout(function(){menu.remove();},900);
+      }).catch(function(){
+        var ta=document.createElement('textarea');ta.value=u;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+        copyBtn.textContent='Copied!';setTimeout(function(){menu.remove();},900);
+      });
+    });
+    function mkA(text,href){var a=document.createElement('a');a.href=href;a.target='_blank';a.rel='noopener';a.textContent=text;return a;}
+    menu.appendChild(copyBtn);
+    menu.appendChild(mkA('Email','mailto:?subject='+encodeURIComponent(h)+'&body='+encodeURIComponent(u)));
+    menu.appendChild(mkA('WhatsApp','https://wa.me/?text='+encodeURIComponent(h+'\n'+u)));
+    menu.appendChild(mkA('Facebook','https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(u)));
+    menu.appendChild(mkA('LinkedIn','https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(u)));
+    menu.appendChild(mkA('Bluesky','https://bsky.app/intent/compose?text='+encodeURIComponent(h+'\n\n'+u)));
+    menu.appendChild(mkA('X / Twitter','https://twitter.com/intent/tweet?text='+encodeURIComponent(h)+'&url='+encodeURIComponent(u)));
+    btn.closest('.foot').appendChild(menu);
+  });
+}
+
+function wireNudge(){
+  if(localStorage.getItem('goodlede_subscribed')||localStorage.getItem('goodlede_nudge_dismissed')) return;
+  var shown=false;
+  function showNudge(){
+    if(shown||localStorage.getItem('goodlede_subscribed')||localStorage.getItem('goodlede_nudge_dismissed')) return;
+    shown=true;
+    var n=document.createElement('div');
+    n.id='sub-nudge';
+    n.style.cssText='position:fixed;bottom:0;left:0;right:0;background:var(--paper-2);border-top:2px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.10);';
+    n.innerHTML='<span style="font-family:\'Fraunces\',serif;font-size:16px;flex:1;min-width:160px;">Want good news in your inbox daily?</span>'
+      +'<div style="display:flex;gap:8px;flex:1;min-width:220px;">'
+      +'<input id="nudge-email" type="email" placeholder="you@example.com" autocomplete="email" inputmode="email" style="flex:1;font-family:\'Newsreader\',serif;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);min-width:0;">'
+      +'<button id="nudge-sub-btn" style="font-family:\'Newsreader\',serif;font-size:15px;padding:8px 16px;background:var(--blue);color:var(--paper);border:none;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Subscribe</button>'
+      +'</div>'
+      +'<button id="nudge-close" style="background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;padding:2px 6px;line-height:1;flex-shrink:0;">&times;</button>';
+    document.body.appendChild(n);
+    document.getElementById('nudge-close').addEventListener('click',function(){
+      localStorage.setItem('goodlede_nudge_dismissed','1');n.remove();
+    });
+    document.getElementById('nudge-sub-btn').addEventListener('click',async function(){
+      var emailEl=document.getElementById('nudge-email');
+      var e=(emailEl.value||'').trim().toLowerCase();
+      if(!e||!e.includes('@')){emailEl.focus();return;}
+      var btn2=document.getElementById('nudge-sub-btn');
+      btn2.textContent='…';btn2.disabled=true;
+      try{
+        var ok=await subscribe(e);
+        if(ok){
+          localStorage.setItem('goodlede_subscribed','1');
+          n.innerHTML='<span style="font-family:\'Fraunces\',serif;font-size:16px;color:var(--blue);flex:1;">You\'re on the list. Thanks!</span><button id="nudge-ty-x" style="background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;padding:2px 6px;">&times;</button>';
+          document.getElementById('nudge-ty-x').addEventListener('click',function(){n.remove();});
+          setTimeout(function(){n.remove();},4000);
+        } else {btn2.textContent='Try again';btn2.disabled=false;}
+      }catch(_){btn2.textContent='Try again';btn2.disabled=false;}
+    });
+  }
+  setTimeout(showNudge,45000);
+  window.addEventListener('scroll',function onScroll(){
+    if((window.scrollY+window.innerHeight)>document.body.scrollHeight*0.65){showNudge();window.removeEventListener('scroll',onScroll);}
+  },{passive:true});
+}
+
+(function init(){ setVersion();setDateline(); showApp(); loadFeed(); wireSharing(); wireNudge(); })();
 </script>
+
+<!-- Donate Modal -->
+<div id="donate-modal" style="display:none;position:fixed;inset:0;background:rgba(28,24,16,.55);z-index:100;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:32px 28px 24px;max-width:460px;width:100%;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.12);">
+    <button onclick="closeDonate()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink-soft);line-height:1;">&times;</button>
+    <h2 style="font-family:'Fraunces',serif;font-weight:500;font-size:22px;margin-bottom:6px;">Keep good news free.</h2>
+    <p style="font-size:14px;color:var(--ink-soft);margin-bottom:20px;line-height:1.5;">Goodlede is ad-free and editorially independent. A small contribution keeps it that way.</p>
+    <div style="display:flex;justify-content:center;margin-bottom:18px;">
+      <div class="donate-toggle">
+        <button class="dt-on" id="dt-once" onclick="setDType('once')">One-time</button>
+        <button id="dt-monthly" onclick="setDType('monthly')">Monthly</button>
+      </div>
+    </div>
+    <div class="donate-amts">
+      <button class="da" onclick="setDA(1)">$1</button>
+      <button class="da da-on" onclick="setDA(5)">$5</button>
+      <button class="da" onclick="setDA(10)">$10</button>
+      <button class="da" onclick="setDA(20)">$20</button>
+      <button class="da" id="da-custom" onclick="setDA('custom')">Custom</button>
+    </div>
+    <div class="donate-custom-row" id="donate-custom-row" style="text-align:center;">
+      <input id="donate-custom-val" type="number" min="1" max="9999" placeholder="amount" />
+    </div>
+    <div class="donate-btn-row">
+      <button class="donate-btn" id="donate-btn" onclick="doDonate()">Donate $5 once</button>
+      <div class="donate-msg" id="donate-msg"></div>
+      <span class="donate-note" id="donate-note">Secure checkout via Stripe. No account required.</span>
+      <p style="font-size:12px;color:var(--ink-faint);margin-top:6px;">1.5% of every donation funds CO2 removal through <a href="https://climate.stripe.com" target="_blank" rel="noopener" style="color:var(--ink-faint);">Stripe Climate</a>.</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>
