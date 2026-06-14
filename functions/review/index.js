@@ -203,14 +203,19 @@ async function act(id,token,action,skipReason){
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
     if(skipReason)url+='&skip_reason='+encodeURIComponent(skipReason);
-    await fetch(url);
+    const resp=await fetch(url);
+    if(!resp.ok){
+      card.querySelectorAll('button').forEach(b=>b.disabled=false);
+      alert('Action failed (HTTP '+resp.status+'). The story was NOT updated. Please try again.');
+      return;
+    }
     card.classList.remove('skip-pending');
     const outcome=action==='approve'?'approved':action==='defer'?'deferred':'skipped';
     card.classList.add('done',outcome);
     badge.textContent=action==='approve'?'✓ Approved':action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
     remaining=Math.max(0,remaining-1);
     updateCounter();
-  }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);}
+  }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);alert('Network error — story NOT updated. Check your connection and try again.');}
 }
 async function unlock(){
   const t=document.getElementById('tok-input').value.trim();
