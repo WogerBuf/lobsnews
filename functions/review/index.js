@@ -67,7 +67,11 @@ export async function onRequestGet(context) {
       + '<button class="sr-btn" onclick="act(\'' + id + '\',\'' + tok + '\',\'skip\',\'political\')">Political</button>'
       + '<button class="sr-btn" onclick="act(\'' + id + '\',\'' + tok + '\',\'skip\',\'off-topic\')">Off topic</button>'
       + '<button class="sr-btn" onclick="act(\'' + id + '\',\'' + tok + '\',\'skip\',\'poor-source\')">Poor source</button>'
-      + '<button class="sr-btn sr-none" onclick="act(\'' + id + '\',\'' + tok + '\',\'skip\',\'\')">Skip (no reason)</button>'
+      + '<div class="sr-custom">'
+      + '<input class="sr-input" id="sri-' + id + '" type="text" placeholder="Other reason…" onkeydown="if(event.key===\'Enter\'){var v=this.value.trim();act(\'' + id + '\',\'' + tok + '\',\'skip\',v);}">'
+      + '<button class="sr-send" onclick="var v=document.getElementById(\'sri-' + id + '\').value.trim();act(\'' + id + '\',\'' + tok + '\',\'skip\',v);">Skip &#8629;</button>'
+      + '</div>'
+      + '<button class="sr-btn sr-none" onclick="act(\'' + id + '\',\'' + tok + '\',\'skip\',\'\')">No reason</button>'
       + '</div>'
       + '</div>';
   }
@@ -156,6 +160,12 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .sr-btn{font-family:'Newsreader',serif;font-size:12px;padding:4px 11px;background:transparent;border:1px solid var(--line);border-radius:3px;cursor:pointer;color:var(--ink-soft);}
 .sr-btn:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-soft);}
 .sr-none{color:var(--ink-faint);font-style:italic;}
+.sr-custom{flex:0 0 100%;display:flex;gap:6px;margin-top:6px;}
+.sr-input{flex:1;font-family:'Newsreader',serif;font-size:13px;padding:5px 9px;border:1px solid var(--line);border-radius:3px;background:#FDFAF5;color:var(--ink);min-width:0;}
+.sr-input:focus{outline:none;border-color:var(--amber);}
+.sr-input::placeholder{color:var(--ink-faint);}
+.sr-send{font-family:'Newsreader',serif;font-size:12px;padding:5px 12px;background:var(--amber);color:#F5F0E6;border:none;border-radius:3px;cursor:pointer;white-space:nowrap;}
+.sr-send:hover{background:#6a4710;}
 .gate{max-width:400px;margin:80px auto;text-align:center;background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:32px 28px;}
 .gate input{width:100%;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FDFAF5;color:var(--ink);margin-bottom:10px;}
 .gate input:focus{outline:none;border-color:var(--blue);}
