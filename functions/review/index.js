@@ -166,6 +166,8 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .sr-input::placeholder{color:var(--ink-faint);}
 .sr-send{font-family:'Newsreader',serif;font-size:12px;padding:5px 12px;background:var(--amber);color:#F5F0E6;border:none;border-radius:3px;cursor:pointer;white-space:nowrap;}
 .sr-send:hover{background:#6a4710;}
+.undo-btn{font-family:'Newsreader',serif;font-size:11px;padding:2px 8px;background:transparent;border:1px solid currentColor;border-radius:3px;cursor:pointer;color:inherit;opacity:.65;margin-left:10px;}
+.undo-btn:hover{opacity:1;}
 .gate{max-width:400px;margin:80px auto;text-align:center;background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:32px 28px;}
 .gate input{width:100%;font-family:'Newsreader',serif;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FDFAF5;color:var(--ink);margin-bottom:10px;}
 .gate input:focus{outline:none;border-color:var(--blue);}
@@ -222,10 +224,23 @@ async function act(id,token,action,skipReason){
     card.classList.remove('skip-pending');
     const outcome=action==='approve'?'approved':action==='defer'?'deferred':'skipped';
     card.classList.add('done',outcome);
-    badge.textContent=action==='approve'?'✓ Approved':action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
+    const label=action==='approve'?'✓ Approved':action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
+    badge.innerHTML=label+'<button class="undo-btn" onclick="undoAct(\''+id+'\',\''+token+'\')">↩ Undo</button>';
     remaining=Math.max(0,remaining-1);
     updateCounter();
   }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);alert('Network error — story NOT updated. Check your connection and try again.');}
+}
+async function undoAct(id,token){
+  const card=document.getElementById('c-'+id);
+  const badge=document.getElementById('b-'+id);
+  if(!card)return;
+  const resp=await fetch(APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action=undo');
+  if(!resp.ok){alert('Undo failed — the story was not restored. Please try again.');return;}
+  card.classList.remove('done','approved','skipped','deferred','skip-pending');
+  card.querySelectorAll('button').forEach(b=>b.disabled=false);
+  badge.innerHTML='';
+  remaining++;
+  updateCounter();
 }
 async function unlock(){
   const t=document.getElementById('tok-input').value.trim();
