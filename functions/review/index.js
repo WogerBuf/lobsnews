@@ -225,7 +225,7 @@ async function act(id,token,action,skipReason){
     const outcome=action==='approve'?'approved':action==='defer'?'deferred':'skipped';
     card.classList.add('done',outcome);
     const label=action==='approve'?'✓ Approved':action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
-    badge.innerHTML=label+'<button class="undo-btn" onclick="undoAct(\''+id+'\',\''+token+'\')">↩ Undo</button>';
+    badge.innerHTML=label+'<button class="undo-btn" data-id="'+id+'" data-tok="'+token+'" onclick="undoAct(this.dataset.id,this.dataset.tok)">↩ Undo</button>';
     remaining=Math.max(0,remaining-1);
     updateCounter();
   }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);alert('Network error — story NOT updated. Check your connection and try again.');}
