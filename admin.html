@@ -4,10 +4,10 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="robots" content="noindex,nofollow"/>
-<title>Lobs News — Admin</title>
+<title>Goodlede — Admin</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
-:root{--paper:#F6F2E9;--paper-2:#EFEADD;--ink:#221E18;--ink-soft:#5A5248;--line:#D8CFBC;--green:#2F5D3A;--clay:#8A4B33;--gold:#9A7B33;}
+:root{--paper:#F5F0E6;--paper-2:#EBE5D6;--ink:#1C1810;--ink-soft:#58503F;--line:#D6CBB5;--blue:#2B4B78;--amber:#8F6115;--green:#2B4B78;--clay:#8F6115;--gold:#8F6115;}
 *{box-sizing:border-box;}
 body{margin:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.5;background:var(--paper);min-height:100vh;padding:28px 18px 60px;}
 .wrap{max-width:860px;margin:0 auto;}
@@ -21,7 +21,7 @@ input,select,button{font-family:'Newsreader',serif;font-size:15px;}
 .login input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);min-width:0;}
 .btn{padding:9px 16px;border-radius:4px;border:1px solid var(--green);background:var(--green);color:var(--paper);cursor:pointer;}
 .btn:hover{background:#264c30;}
-.btn-ghost{background:transparent;color:var(--green);}
+.btn-ghost{background:transparent;color:var(--green);}.tab-on{background:var(--green)!important;color:var(--paper)!important;}
 .btn-ghost:hover{background:var(--green);color:var(--paper);}
 .btn-clay{border-color:var(--clay);background:var(--clay);} .btn-clay:hover{background:#6f3a26;}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
@@ -50,7 +50,7 @@ input,select,button{font-family:'Newsreader',serif;font-size:15px;}
 <body>
 
 <div class="wrap">
-  <div class="mark">Lobs <span class="mark2">News</span></div>
+  <div class="mark">Good<span class="mark2">lede</span></div>
   <p class="tag">Admin</p>
 
   <!-- LOGIN -->
@@ -77,15 +77,15 @@ input,select,button{font-family:'Newsreader',serif;font-size:15px;}
 </div>
 
 <script>
-const FUNCTIONS_BASE = "https://wfpokgexkjumsbnwcxfo.functions.supabase.co";
+const FUNCTIONS_BASE = "https://qvmewmebcrkmyutvbzxv.functions.supabase.co";
 let SERVER_NOW = Date.now();
 
 function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-function tok(){return localStorage.getItem("lobs_admin_token")||"";}
+function tok(){return localStorage.getItem("goodlede_admin_token")||"";}
 function fmt(iso){try{return new Date(iso).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});}catch(e){return iso;}}
 
 async function api(action, extra){
-  const r = await fetch(`${FUNCTIONS_BASE}/lobs-admin`,{
+  const r = await fetch(`${FUNCTIONS_BASE}/goodlede-admin`,{
     method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify(Object.assign({token:tok(),action},extra||{}))
   });
@@ -101,9 +101,9 @@ function show(view){
 async function unlock(){
   const t = document.getElementById("token").value.trim();
   if(!t){document.getElementById("loginMsg").textContent="Enter the token.";return;}
-  localStorage.setItem("lobs_admin_token", t);
+  localStorage.setItem("goodlede_admin_token", t);
   const {status} = await api("list");
-  if(status===403){ localStorage.removeItem("lobs_admin_token"); document.getElementById("loginMsg").textContent="That token wasn't accepted."; return; }
+  if(status===403){ localStorage.removeItem("goodlede_admin_token"); document.getElementById("loginMsg").textContent="That token wasn't accepted."; return; }
   document.getElementById("loginMsg").textContent="";
   show("panel"); load();
 }
@@ -140,12 +140,14 @@ function render(stories){
   const list = document.getElementById("list");
   list.innerHTML = stories.map(s=>{
     const held = s.hold_until && new Date(s.hold_until).getTime() > SERVER_NOW;
+    const submitter = s.curator && s.curator !== "Editor's Pick" ? `<div class="when" style="color:var(--blue);font-weight:500;">Submitted by ${esc(s.curator)}</div>` : (s.curator === "Editor's Pick" ? `<div class="when">Editor\u2019s Pick</div>` : `<div class="when" style="color:var(--ink-soft);font-style:italic;">Automated</div>`);
     return `<div class="card${held?' held':''}">
       <div class="cat">${esc(s.category)}${s.verification?` \u00b7 ${esc(s.verification)}`:""}</div>
-      <div class="hl">${esc(s.headline)}</div>
-      <div class="when">First seen ${esc(fmt(s.first_seen))}</div>
+      <div class="hl"><a href="${esc(s.source_url||'#')}" target="_blank" style="color:inherit;text-decoration:none;">${esc(s.headline)}</a></div>
+      ${submitter}
+      <div class="when">Added ${esc(fmt(s.first_seen))}</div>
       ${statusLine(s)}
-      ${controls(s)}
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">${controls(s)}<button class="hb" style="border-color:var(--clay);color:var(--clay);" data-del="${esc(s.id)}">Delete</button></div>
     </div>`;
   }).join("");
 
@@ -156,6 +158,7 @@ function render(stories){
     doHold(id,{hold_until:new Date(v).toISOString()});
   }));
   list.querySelectorAll(".release").forEach(b=>b.addEventListener("click",()=>doRelease(b.getAttribute("data-rel"))));
+  list.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{if(confirm("Delete this story permanently?"))doDelete(b.getAttribute("data-del"));}));
 }
 
 function msg(t,cls){const m=document.getElementById("panelMsg");m.textContent=t;m.className="msg "+(cls||"");}
@@ -182,7 +185,31 @@ async function doRelease(id){
   if(!d.ok){ msg(d.error||"Release failed.","err"); return; }
   msg("Released.","ok"); load();
 }
-function logout(){ localStorage.removeItem("lobs_admin_token"); document.getElementById("token").value=""; show("login"); }
+function logout(){ localStorage.removeItem("goodlede_admin_token"); document.getElementById("token").value=""; show("login"); }
+
+function switchTab(t){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("tab-on",b.getAttribute("data-tab")===t));
+  document.getElementById("tab-stories").style.display = t==="stories"?"":"none";
+  document.getElementById("tab-subscribers").style.display = t==="subscribers"?"":"none";
+  if(t==="subscribers") loadSubscribers();
+}
+async function loadSubscribers(){
+  const msg=document.getElementById("sub-count");
+  const list=document.getElementById("sub-list");
+  msg.textContent="Loading…";list.innerHTML="";
+  try{
+    const r=await fetch(`${FUNCTIONS_BASE}/goodlede-admin`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:tok(),action:"subscribers"})});
+    const d=await r.json();
+    if(!d.ok){msg.textContent=d.error||"Failed to load.";return;}
+    const active=d.subscribers.filter(s=>!s.unsubscribed_at);
+    const unsub=d.subscribers.filter(s=>s.unsubscribed_at);
+    msg.textContent=active.length+" active subscriber"+(active.length===1?"":"s")+(unsub.length?", "+unsub.length+" unsubscribed":"");
+    const rows=[...active.map(s=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;"><span style="font-size:15px;">${esc(s.email)}</span><span style="font-size:12px;color:var(--ink-soft);">Since ${esc(fmt(s.created_at))}</span></div>`),
+      ...(unsub.length?[`<div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 8px;">Unsubscribed</div>`]:[]),
+      ...unsub.map(s=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;opacity:.55;"><span style="font-size:15px;">${esc(s.email)}</span><span style="font-size:12px;color:var(--ink-soft);">Unsub ${esc(fmt(s.unsubscribed_at))}</span></div>`)];
+    list.innerHTML=rows.join("");
+  }catch(e){msg.textContent="Error: "+e.message;}
+}
 
 document.getElementById("loginBtn").addEventListener("click",unlock);
 document.getElementById("token").addEventListener("keydown",e=>{if(e.key==="Enter")unlock();});

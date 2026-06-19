@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /story/
+Disallow: /admin.html
+Disallow: /_*
+
+Sitemap: https://goodlede.com/sitemap.xml
