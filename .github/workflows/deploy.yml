@@ -13,3 +13,12 @@ jobs:
         run: npx wrangler pages deploy . --project-name lobsnews --branch main --commit-dirty=true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Smoke test — verify /approve function is live
+        run: |
+          sleep 10
+          BODY=$(curl -sf "https://goodlede.com/approve?id=smoke-test&token=smoke-test&action=skip" || true)
+          if echo "$BODY" | grep -q "Goodlede — Look on the Bright Side"; then
+            echo "DEPLOY FAILURE: /approve is returning the homepage instead of the edge function"
+            exit 1
+          fi
+          echo "Smoke test passed: /approve is routing correctly"
