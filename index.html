@@ -176,6 +176,7 @@ const SAMPLES=[
 ];
 
 let ALL=[], ACTIVE="All", IS_SAMPLE=false, LAST_EMAIL="";
+const PAGE_SIZE=24; let SHOWN=PAGE_SIZE;
 function sigCls(s=""){s=s.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"s-strong";if(s.includes("notable"))return"s-mid";return"s-soft";}
 function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";if(s.includes("moderate"))return"d-mid";return"d-soft";}
 function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
@@ -208,14 +209,16 @@ function renderFilters(){
   const hasPick=ALL.some(s=>s.curated);
   const cats=["All",...(hasPick?[PICKS]:[]),...CATEGORIES.filter(c=>ALL.some(s=>s.category===c))];
   f.innerHTML=cats.map(c=>`<button class="pill${c===ACTIVE?' pill-on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join("")+`<button class="refresh" id="refresh">&#8635; Refresh</button>`;
-  f.querySelectorAll(".pill").forEach(b=>b.addEventListener("click",()=>{ACTIVE=b.getAttribute("data-c");renderFilters();renderCards();}));
+  f.querySelectorAll(".pill").forEach(b=>b.addEventListener("click",()=>{ACTIVE=b.getAttribute("data-c");SHOWN=PAGE_SIZE;renderFilters();renderCards();}));
   document.getElementById("refresh").addEventListener("click",loadFeed);
 }
 function renderCards(){
   const c=document.getElementById("content");
   const items=ACTIVE===PICKS?ALL.filter(s=>s.curated):(ACTIVE==="All"?ALL:ALL.filter(s=>s.category===ACTIVE));
   if(!items.length){c.innerHTML='<div class="loading"><p>Nothing here yet.</p></div>';return;}
-  c.innerHTML='<div class="grid">'+items.map(s=>{
+  const visible=items.slice(0,SHOWN);
+  const hasMore=items.length>SHOWN;
+  c.innerHTML='<div class="grid">'+visible.map(s=>{
     const verified=(s.verification||"").toLowerCase().includes("verif");
     const vfTip=verified?"Passed our second source check \u2014 a reputable source directly states this and the claim held up. It's a source check, not an independent fact-check, so confirm anything important at the link.":"Properly sourced, but flagged \u2014 the claim is early, limited in scope, or has open questions. Read it with a grain of salt.";
     const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?`<span class="badge ok has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Verified. ${esc(vfTip)}">\u2713 Verified</span>`:`<span class="badge caution has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Caution. ${esc(vfTip)}">\u25B3 Caution</span>`);
@@ -238,9 +241,10 @@ function renderCards(){
       ${s.caveat?`<p class="caveat"><span class="lbl lbl-c">What it doesn't mean</span>${esc(s.caveat)}</p>`:""}
       <div class="meta">${sigSpan}${confSpan}</div>
 
-      <div class="foot"><button class="share-btn" data-h="${esc(dh)}" data-u="${SITE_URL}/story/${esc(s.id)}">Share</button>${hasLink?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>';
+      <div class="foot"><button class="share-btn" data-h="${esc(dh)}" data-u="${SITE_URL}/story/${esc(s.id)}">Share</button>${hasLink?`<a class="src" href="${esc(s.source_url)}" target="_blank" rel="noreferrer">${esc(s.source_name||"Source")} \u2197</a>`:`<span style="font-size:13px;color:var(--ink-soft);">${esc(s.source_name||"")}</span>`}</div></article>`;}).join("")+'</div>'
+    +(hasMore?`<div style="text-align:center;margin:32px 0 8px"><button id="load-more" style="padding:10px 28px;border:1.5px solid var(--ink-soft);border-radius:6px;background:transparent;color:var(--ink);font-size:15px;cursor:pointer;letter-spacing:.01em" onclick="SHOWN+=PAGE_SIZE;renderCards()">Load more stories \u2193</button><p style="font-size:13px;color:var(--ink-soft);margin:8px 0 0">${items.length-SHOWN} more</p></div>`:'');
 }
-function render(items,isSample){ALL=items;IS_SAMPLE=isSample;ACTIVE="All";renderFilters();renderCards();}
+function render(items,isSample){ALL=items;IS_SAMPLE=isSample;ACTIVE="All";SHOWN=PAGE_SIZE;renderFilters();renderCards();}
 function showApp(){var g=document.getElementById("gate");if(g)g.classList.add("hidden");document.getElementById("app").classList.remove("hidden");wireSubscribe();}
 
 async function fetchFeed(email){
