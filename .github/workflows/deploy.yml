@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Stamp build date
+        run: sed -i "s/__BUILD_DATE__/$(date -u +%Y-%m-%d)/" index.html
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy . --project-name lobsnews --branch main --commit-dirty=true
         env:
