@@ -55,6 +55,7 @@ export async function onRequestGet(context) {
       + '<div class="meta">' + sig + conf + '</div>'
       + '<div class="actions">'
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
+      + '<button class="btn-h" onclick="act(\'' + id + '\',\'' + tok + '\',\'hero\')">&#9733; Hero</button>'
       + '<button class="btn-s" onclick="pendSkip(\'' + id + '\')">&#10007; Skip &#9660;</button>'
       + '<button class="btn-l" onclick="act(\'' + id + '\',\'' + tok + '\',\'defer\',\'\')">&#8635; Later</button>'
       + '<a class="src" href="' + src + '" target="_blank" rel="noopener">' + esc(s.source_name || 'Source') + ' &#8599;</a>'
@@ -152,6 +153,8 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .card.skip-pending .btn-s{background:var(--amber);color:#F5F0E6;}
 .btn-l{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:transparent;color:var(--ink-soft);border:1px solid var(--line);border-radius:4px;cursor:pointer;}
 .btn-l:hover{background:var(--ink-soft);color:#F5F0E6;border-color:var(--ink-soft);}
+.btn-h{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:var(--amber);color:#F5F0E6;border:none;border-radius:4px;cursor:pointer;}
+.btn-h:hover{background:#6b470f;}
 .card.deferred .done-badge{display:flex;background:rgba(88,80,63,.10);color:var(--ink-soft);}
 .card.deferred{border-color:var(--ink-soft);}
 .src{font-size:13px;color:var(--ink-soft);text-decoration:underline;padding:8px 4px;}
@@ -222,9 +225,9 @@ async function act(id,token,action,skipReason){
       return;
     }
     card.classList.remove('skip-pending');
-    const outcome=action==='approve'?'approved':action==='defer'?'deferred':'skipped';
+    const outcome=(action==='approve'||action==='hero')?'approved':action==='defer'?'deferred':'skipped';
     card.classList.add('done',outcome);
-    const label=action==='approve'?'✓ Approved':action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
+    const label=action==='hero'?'★ Hero':action==='approve'?'✓ Approved':action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
     badge.innerHTML=label+'<button class="undo-btn" data-id="'+id+'" data-tok="'+token+'" onclick="undoAct(this.dataset.id,this.dataset.tok)">↩ Undo</button>';
     remaining=Math.max(0,remaining-1);
     updateCounter();
