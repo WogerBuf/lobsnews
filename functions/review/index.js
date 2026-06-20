@@ -45,16 +45,17 @@ export async function onRequestGet(context) {
     const id = esc(s.id);
     const tok = esc(s.review_token);
     const src = esc(s.source_url || '#');
-    return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '">'
+    return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '">'
       + '<div class="done-badge" id="b-' + id + '"></div>'
       + polFlag
       + '<div class="cat">' + esc(s.category || '') + '</div>'
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
-      + (s.caveat ? '<div><div class="cav-hd"><span class="lbl lbl-a">What it does not mean</span><label class="cav-toggle"><input type="checkbox" id="cc-' + id + '" checked onchange="toggleCaveat(\'' + id + '\')"><span class="cav-lbl">Include</span></label></div><p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p></div>' : '')
+      + (s.caveat ? '<div><span class="lbl lbl-a">What it does not mean</span><p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p></div>' : '')
       + '<div class="meta">' + sig + conf + '</div>'
       + '<div class="actions">'
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
+      + (s.caveat ? '<button class="btn-nd" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\',null,true)">&#10003; No disclaimer</button>' : '')
       + '<button class="btn-h" onclick="act(\'' + id + '\',\'' + tok + '\',\'hero\')">&#9733; Hero</button>'
       + '<button class="btn-s" onclick="pendSkip(\'' + id + '\')">&#10007; Skip &#9660;</button>'
       + '<button class="btn-l" onclick="act(\'' + id + '\',\'' + tok + '\',\'defer\',\'\')">&#8635; Later</button>'
@@ -155,6 +156,16 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .btn-l:hover{background:var(--ink-soft);color:#F5F0E6;border-color:var(--ink-soft);}
 .btn-h{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:var(--amber);color:#F5F0E6;border:none;border-radius:4px;cursor:pointer;}
 .btn-h:hover{background:#6b470f;}
+.btn-nd{font-family:'Newsreader',serif;font-size:15px;padding:8px 16px;background:transparent;color:var(--blue);border:1px dashed var(--blue);border-radius:4px;cursor:pointer;}
+.btn-nd:hover{background:var(--blue);color:#F5F0E6;}
+#bulk-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+#bulk-bar .bulk-lbl{font-size:13px;color:var(--ink-soft);margin-right:4px;}
+#bulk-bar button{font-family:'Newsreader',serif;font-size:14px;padding:7px 16px;border-radius:4px;cursor:pointer;}
+#bulk-bar .ba{background:var(--blue);color:#F5F0E6;border:none;}
+#bulk-bar .ba:hover{background:#1e3557;}
+#bulk-bar .bnd{background:transparent;color:var(--blue);border:1px dashed var(--blue);}
+#bulk-bar .bnd:hover{background:var(--blue);color:#F5F0E6;}
+#bulk-bar button:disabled{opacity:.5;cursor:default;}
 .card.deferred .done-badge{display:flex;background:rgba(88,80,63,.10);color:var(--ink-soft);}
 .card.deferred{border-color:var(--ink-soft);}
 .src{font-size:13px;color:var(--ink-soft);text-decoration:underline;padding:8px 4px;}
@@ -193,6 +204,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 </div>
 <div id="review-screen" class="wrap" style="${reviewScreenStyle}">
   <p class="status" id="status-msg">${esc(statusText)}</p>
+  ${initialCount > 0 ? '<div id="bulk-bar"><span class="bulk-lbl">All remaining:</span><button class="ba" onclick="bulkApprove(false)">&#10003; Approve all</button><button class="bnd" onclick="bulkApprove(true)">&#10003; Approve all &middot; no disclaimers</button></div>' : ''}
   <div id="stories">${storiesHtml}</div>
 </div>
 <script>
@@ -210,14 +222,14 @@ function pendSkip(id){
   if(!card)return;
   card.classList.toggle('skip-pending');
 }
-async function act(id,token,action,skipReason){
+async function act(id,token,action,skipReason,dropCaveat){
   const card=document.getElementById('c-'+id);
   const badge=document.getElementById('b-'+id);
   if(!card)return;
   card.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
-    if(action==='approve'||action==='hero'){url+='&confirmed=1';const ccb=document.getElementById('cc-'+id);if(ccb&&!ccb.checked)url+='&drop_caveat=1';}
+    if(action==='approve'||action==='hero'){url+='&confirmed=1';if(dropCaveat)url+='&drop_caveat=1';}
     if(action==='skip')url+='&skip_reason='+encodeURIComponent(skipReason||'');
     const resp=await fetch(url);
     if(!resp.ok){
@@ -234,7 +246,14 @@ async function act(id,token,action,skipReason){
     updateCounter();
   }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);alert('Network error — story NOT updated. Check your connection and try again.');}
 }
-function toggleCaveat(id){const cv=document.getElementById('cv-'+id);const lbl=document.getElementById('cc-'+id)?.closest('label')?.querySelector('.cav-lbl');if(cv)cv.classList.toggle('struck');if(lbl)lbl.textContent=cv?.classList.contains('struck')?'Excluded':'Include';}
+async function bulkApprove(dropCaveat){
+  const cards=[...document.querySelectorAll('#stories .card')].filter(c=>!c.classList.contains('done'));
+  if(!cards.length){alert('Nothing left to approve.');return;}
+  if(!confirm('Approve all '+cards.length+' remaining '+(cards.length===1?'story':'stories')+(dropCaveat?', dropping their disclaimers':'')+'? They publish live immediately.'))return;
+  const bb=document.getElementById('bulk-bar');if(bb)bb.querySelectorAll('button').forEach(b=>b.disabled=true);
+  for(const c of cards){ await act(c.dataset.id,c.dataset.tok,'approve',null,dropCaveat); }
+  if(bb)bb.querySelectorAll('button').forEach(b=>b.disabled=false);
+}
 async function undoAct(id,token){
   const card=document.getElementById('c-'+id);
   const badge=document.getElementById('b-'+id);
