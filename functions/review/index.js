@@ -51,11 +51,10 @@ export async function onRequestGet(context) {
       + '<div class="cat">' + esc(s.category || '') + '</div>'
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
-      + (s.caveat ? '<div><span class="lbl lbl-a">What it does not mean</span><p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p></div>' : '')
+      + (s.caveat ? '<div class="cav-block"><div class="cav-hd"><span class="lbl lbl-a">What it does not mean</span><button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></div><p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p></div>' : '')
       + '<div class="meta">' + sig + conf + '</div>'
       + '<div class="actions">'
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
-      + (s.caveat ? '<button class="btn-nd" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\',null,true)">&#10003; No disclaimer</button>' : '')
       + '<button class="btn-h" onclick="act(\'' + id + '\',\'' + tok + '\',\'hero\')">&#9733; Hero</button>'
       + '<button class="btn-s" onclick="pendSkip(\'' + id + '\')">&#10007; Skip &#9660;</button>'
       + '<button class="btn-l" onclick="act(\'' + id + '\',\'' + tok + '\',\'defer\',\'\')">&#8635; Later</button>'
@@ -137,7 +136,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:500;margin-bottom:2px;}
 .lbl-b{color:var(--blue);}.lbl-a{color:var(--amber);}
 .basis{font-size:13px;color:var(--ink);margin-bottom:10px;line-height:1.55;}
-.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}.cav-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}.cav-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--amber);cursor:pointer;user-select:none;}.cav-toggle input{accent-color:var(--amber);width:11px;height:11px;margin:0;vertical-align:middle;}.caveat.struck{opacity:.3;text-decoration:line-through;}
+.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}.cav-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}.cav-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--amber);cursor:pointer;user-select:none;}.cav-toggle input{accent-color:var(--amber);width:11px;height:11px;margin:0;vertical-align:middle;}.caveat.struck{opacity:.3;text-decoration:line-through;}.cav-x{font-family:'Newsreader',serif;font-size:11px;padding:2px 9px;background:transparent;color:var(--amber);border:1px solid var(--amber);border-radius:3px;cursor:pointer;white-space:nowrap;}.cav-x:hover{background:var(--amber);color:#F5F0E6;}
 .meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
 .sig{font-size:11px;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;}
 .s-strong{background:var(--blue-soft);color:var(--blue);}
@@ -222,14 +221,23 @@ function pendSkip(id){
   if(!card)return;
   card.classList.toggle('skip-pending');
 }
-async function act(id,token,action,skipReason,dropCaveat){
+function toggleCav(id){
+  const card=document.getElementById('c-'+id);
+  const cv=document.getElementById('cv-'+id);
+  const btn=document.getElementById('cx-'+id);
+  if(!card)return;
+  const off=card.dataset.dropcav==='1';
+  if(off){card.dataset.dropcav='';if(cv)cv.classList.remove('struck');if(btn)btn.innerHTML='&#10007; Disapprove';}
+  else{card.dataset.dropcav='1';if(cv)cv.classList.add('struck');if(btn)btn.innerHTML='&#8635; Restore disclaimer';}
+}
+async function act(id,token,action,skipReason,forceDrop){
   const card=document.getElementById('c-'+id);
   const badge=document.getElementById('b-'+id);
   if(!card)return;
   card.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
-    if(action==='approve'||action==='hero'){url+='&confirmed=1';if(dropCaveat)url+='&drop_caveat=1';}
+    if(action==='approve'||action==='hero'){url+='&confirmed=1';if(forceDrop||card.dataset.dropcav==='1')url+='&drop_caveat=1';}
     if(action==='skip')url+='&skip_reason='+encodeURIComponent(skipReason||'');
     const resp=await fetch(url);
     if(!resp.ok){
