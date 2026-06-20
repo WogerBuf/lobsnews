@@ -51,7 +51,7 @@ export async function onRequestGet(context) {
       + '<div class="cat">' + esc(s.category || '') + '</div>'
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
-      + (s.caveat ? '<p class="caveat"><span class="lbl lbl-a">What it does not mean</span>' + esc(s.caveat) + '</p>' : '')
+      + (s.caveat ? '<div><div class="cav-hd"><span class="lbl lbl-a">What it does not mean</span><label class="cav-toggle"><input type="checkbox" id="cc-' + id + '" checked onchange="toggleCaveat(\'' + id + '\')"><span class="cav-lbl">Include</span></label></div><p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p></div>' : '')
       + '<div class="meta">' + sig + conf + '</div>'
       + '<div class="actions">'
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
@@ -136,7 +136,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:500;margin-bottom:2px;}
 .lbl-b{color:var(--blue);}.lbl-a{color:var(--amber);}
 .basis{font-size:13px;color:var(--ink);margin-bottom:10px;line-height:1.55;}
-.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}
+.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}.cav-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}.cav-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--amber);cursor:pointer;user-select:none;}.cav-toggle input{accent-color:var(--amber);width:11px;height:11px;margin:0;vertical-align:middle;}.caveat.struck{opacity:.3;text-decoration:line-through;}
 .meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
 .sig{font-size:11px;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;}
 .s-strong{background:var(--blue-soft);color:var(--blue);}
@@ -217,7 +217,8 @@ async function act(id,token,action,skipReason){
   card.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
-    if(skipReason)url+='&skip_reason='+encodeURIComponent(skipReason);
+    if(action==='approve'||action==='hero'){url+='&confirmed=1';const ccb=document.getElementById('cc-'+id);if(ccb&&!ccb.checked)url+='&drop_caveat=1';}
+    if(action==='skip')url+='&skip_reason='+encodeURIComponent(skipReason||'');
     const resp=await fetch(url);
     if(!resp.ok){
       card.querySelectorAll('button').forEach(b=>b.disabled=false);
@@ -233,6 +234,7 @@ async function act(id,token,action,skipReason){
     updateCounter();
   }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);alert('Network error — story NOT updated. Check your connection and try again.');}
 }
+function toggleCaveat(id){const cv=document.getElementById('cv-'+id);const lbl=document.getElementById('cc-'+id)?.closest('label')?.querySelector('.cav-lbl');if(cv)cv.classList.toggle('struck');if(lbl)lbl.textContent=cv?.classList.contains('struck')?'Excluded':'Include';}
 async function undoAct(id,token){
   const card=document.getElementById('c-'+id);
   const badge=document.getElementById('b-'+id);
