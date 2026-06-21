@@ -32,6 +32,14 @@ html{overflow-x:hidden;}body{margin:0;-webkit-text-size-adjust:100%;text-size-ad
 .refresh{margin-left:auto;font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border:1px solid var(--blue);color:var(--blue);background:transparent;border-radius:999px;cursor:pointer;} .refresh:hover{background:var(--blue);color:var(--paper);}
 .grid>.card:first-child{grid-column:1/-1;}.grid>.card:first-child .hl{font-size:27px;line-height:1.18;}.grid>.card:first-child .basis,.grid>.card:first-child .caveat{font-size:14.5px;}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;}
 .card{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:20px 20px 16px;display:flex;flex-direction:column;}
+.cthumb{margin:-20px -20px 14px;overflow:hidden;border-radius:4px 4px 0 0;border-bottom:1px solid var(--line);background:var(--paper);line-height:0;}
+.cthumb img{width:100%;height:190px;object-fit:cover;display:block;}
+.grid>.card:first-child .cthumb img{height:340px;}
+.badge.fresh{background:rgba(43,75,120,.14);color:var(--blue);font-weight:600;}
+.newbar{font-size:13px;color:var(--blue);font-weight:500;letter-spacing:.3px;margin:0 0 16px;display:flex;align-items:center;gap:7px;}
+.newbar .dotn{width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block;flex-shrink:0;}
+.reltime{color:var(--ink-soft);}
+@media(max-width:600px){.cthumb img{height:170px;}.grid>.card:first-child .cthumb img{height:210px;}}
 .ctop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
 .bgroup{display:flex;gap:6px;align-items:center;flex-shrink:0;}
 .cat{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;}
@@ -177,6 +185,8 @@ const SAMPLES=[
 
 let ALL=[], ACTIVE="All", IS_SAMPLE=false, LAST_EMAIL="";
 const PAGE_SIZE=24; let SHOWN=PAGE_SIZE;
+const LAST_VISIT=localStorage.getItem('goodlede_last_visit');
+function relTime(ts){if(!ts)return'';const t=new Date(ts).getTime();if(isNaN(t))return'';const h=(Date.now()-t)/3600000;if(h<0)return'';if(h<1)return'just now';if(h<24)return Math.floor(h)+'h ago';const dd=Math.floor(h/24);if(dd===1)return'yesterday';if(dd<7)return dd+'d ago';return'';}
 function sigCls(s=""){s=s.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"s-strong";if(s.includes("notable"))return"s-mid";return"s-soft";}
 function confCls(s=""){s=s.toLowerCase();if(s.includes("well"))return"d-strong";if(s.includes("moderate"))return"d-mid";return"d-soft";}
 function sigHelp(v=""){const s=v.toLowerCase();if(s.includes("systemic")||s.includes("trend"))return"How big a deal \u2014 part of a broad, structural shift, not an isolated event.";if(s.includes("notable"))return"How big a deal \u2014 meaningful, but early or limited in scope; its wider impact isn't established yet.";return"How big a deal \u2014 a contained, one-time event, specific to a single place or moment.";}
@@ -218,7 +228,9 @@ function renderCards(){
   if(!items.length){c.innerHTML='<div class="loading"><p>Nothing here yet.</p></div>';return;}
   const visible=items.slice(0,SHOWN);
   const hasMore=items.length>SHOWN;
-  c.innerHTML='<div class="grid">'+visible.map(s=>{
+  const newCount=(LAST_VISIT&&!IS_SAMPLE)?items.filter(s=>s.first_seen&&s.first_seen>LAST_VISIT).length:0;
+  const newBar=newCount>0?`<p class="newbar"><span class="dotn"></span>${newCount} new since your last visit</p>`:'';
+  c.innerHTML=newBar+'<div class="grid">'+visible.map(s=>{
     const verified=(s.verification||"").toLowerCase().includes("verif");
     const vfTip=verified?"Passed our second source check \u2014 a reputable source directly states this and the claim held up. It's a source check, not an independent fact-check, so confirm anything important at the link.":"Properly sourced, but flagged \u2014 the claim is early, limited in scope, or has open questions. Read it with a grain of salt.";
     const badge=IS_SAMPLE?'<span class="badge sample">Sample</span>':(verified?`<span class="badge ok has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Verified. ${esc(vfTip)}">\u2713 Verified</span>`:`<span class="badge caution has-tip tip-r tip-down" tabindex="0" role="note" data-tip="${esc(vfTip)}" aria-label="Caution. ${esc(vfTip)}">\u25B3 Caution</span>`);
@@ -233,8 +245,13 @@ function renderCards(){
     const pubDateStr=s.pub_date||(s.first_seen?s.first_seen.slice(0,10):null);
     const dateLabel=pubDateStr?new Date(pubDateStr+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'';
     const authorLabel=s.author?'By '+esc(s.author):'';
-    const byline=(authorLabel||dateLabel)?`<div class="byline">${[authorLabel,dateLabel].filter(Boolean).join(' \u00b7 ')}</div>`:'';
-    return `<article class="card"><div class="ctop"><span class="cat">${esc(s.category)}</span><span class="bgroup">${pickBadge}${badge}</span></div>
+    const relLabel=IS_SAMPLE?'':relTime(s.first_seen);
+    const byBase=[authorLabel,dateLabel].filter(Boolean).join(' \u00b7 ');
+    const byline=(byBase||relLabel)?`<div class="byline">${byBase}${relLabel?(byBase?' \u00b7 ':'')+`<span class="reltime">${relLabel}</span>`:''}</div>`:'';
+    const isNew=LAST_VISIT&&!IS_SAMPLE&&s.first_seen&&s.first_seen>LAST_VISIT;
+    const newBadge=isNew?'<span class="badge fresh">\u2726 New</span>':'';
+    const thumb=(s.og_image&&/^https?:\/\//.test(s.og_image))?`<div class="cthumb"><img loading="lazy" src="${esc(s.og_image)}" alt="" onerror="var t=this.closest('.cthumb');if(t)t.remove();"></div>`:'';
+    return `<article class="card">${thumb}<div class="ctop"><span class="cat">${esc(s.category)}</span><span class="bgroup">${newBadge}${pickBadge}${badge}</span></div>
       <h2 class="hl">${hl}</h2>
       ${byline}
       ${s.basis?`<p class="basis"><span class="lbl">What backs it</span>${esc(s.basis)}</p>`:""}
@@ -267,6 +284,7 @@ async function loadFeed(){
     const d=await r.json();
     if(!d.stories||!d.stories.length){ document.getElementById("content").innerHTML='<div class="loading"><p>No stories yet — check back soon.</p></div>'; return; }
     render(d.stories,false);
+    try{localStorage.setItem('goodlede_last_visit',new Date().toISOString());}catch(_){}
     document.getElementById("note").innerHTML="Each item survived a second-pass source check — still, verify anything that matters against the link.";
   }catch(e){
     document.getElementById("banner").innerHTML='<div class="banner">Couldn\'t reach the feed ('+esc(e.message)+'). Showing sample layout.</div>';
