@@ -391,8 +391,11 @@ function wireNudge(){
       +'</div>'
       +'<button id="nudge-close" style="background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;padding:2px 6px;line-height:1;flex-shrink:0;">&times;</button>';
     document.body.appendChild(n);
+    var setPad=function(){document.body.style.paddingBottom=n.offsetHeight+'px';};
+    setPad();window.addEventListener('resize',setPad);
+    function removeNudge(){window.removeEventListener('resize',setPad);document.body.style.paddingBottom='';n.remove();}
     document.getElementById('nudge-close').addEventListener('click',function(){
-      localStorage.setItem('goodlede_nudge_dismissed','1');n.remove();
+      localStorage.setItem('goodlede_nudge_dismissed','1');removeNudge();
     });
     document.getElementById('nudge-sub-btn').addEventListener('click',async function(){
       var emailEl=document.getElementById('nudge-email');
@@ -405,8 +408,8 @@ function wireNudge(){
         if(ok){
           localStorage.setItem('goodlede_subscribed','1');
           n.innerHTML='<span style="font-family:\'Fraunces\',serif;font-size:16px;color:var(--blue);flex:1;">You\'re on the list. Thanks!</span><button id="nudge-ty-x" style="background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;padding:2px 6px;">&times;</button>';
-          document.getElementById('nudge-ty-x').addEventListener('click',function(){n.remove();});
-          setTimeout(function(){n.remove();},4000);
+          document.getElementById('nudge-ty-x').addEventListener('click',function(){removeNudge();});
+          setTimeout(function(){removeNudge();},4000);
         } else {btn2.textContent='Try again';btn2.disabled=false;}
       }catch(_){btn2.textContent='Try again';btn2.disabled=false;}
     });
