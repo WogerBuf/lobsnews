@@ -51,7 +51,17 @@ export async function onRequestGet(context) {
       + '<div class="cat">' + esc(s.category || '') + '</div>'
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
-      + (s.caveat ? '<div class="cav-block"><div class="cav-hd"><span class="lbl lbl-a">What it does not mean</span><button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></div><p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p></div>' : '')
+      + (s.caveat ? '<div class="cav-block" id="cb-' + id + '">'
+        + '<div class="cav-hd"><span class="lbl lbl-a">What it does not mean</span>'
+        + '<span class="cav-tools"><button class="cav-e" onclick="editCav(\'' + id + '\')">&#9998; Edit</button>'
+        + '<button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></span></div>'
+        + '<p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p>'
+        + '<div class="cav-edit" id="ce-' + id + '"><textarea class="cav-ta" id="ct-' + id + '">' + esc(s.caveat) + '</textarea>'
+        + '<div class="cav-eb"><button class="cav-save" onclick="saveCav(\'' + id + '\')">Save edit</button><button class="cav-cancel" onclick="cancelCav(\'' + id + '\')">Cancel</button></div></div>'
+        + '<div class="cav-why" id="cw-' + id + '"><span class="cav-why-lbl">Why? &mdash; optional, helps it learn</span><div class="cav-chips">'
+        + ['too cynical','inaccurate','not needed here','wrong emphasis'].map(r => '<button type="button" class="cav-chip" onclick="pickReason(\'' + id + '\',this,\'' + r + '\')">' + r + '</button>').join('')
+        + '</div><input class="cav-reason" id="cwr-' + id + '" type="text" placeholder="…or type your reason"></div>'
+        + '</div>' : '')
       + '<div class="meta">' + sig + conf + '</div>'
       + '<div class="actions">'
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
@@ -136,7 +146,25 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:500;margin-bottom:2px;}
 .lbl-b{color:var(--blue);}.lbl-a{color:var(--amber);}
 .basis{font-size:13px;color:var(--ink);margin-bottom:10px;line-height:1.55;}
-.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}.cav-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}.cav-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--amber);cursor:pointer;user-select:none;}.cav-toggle input{accent-color:var(--amber);width:11px;height:11px;margin:0;vertical-align:middle;}.caveat.struck{opacity:.3;text-decoration:line-through;}.cav-x{font-family:'Newsreader',serif;font-size:11px;padding:2px 9px;background:transparent;color:var(--amber);border:1px solid var(--amber);border-radius:3px;cursor:pointer;white-space:nowrap;}.cav-x:hover{background:var(--amber);color:#F5F0E6;}
+.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}.cav-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}.cav-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--amber);cursor:pointer;user-select:none;}.cav-toggle input{accent-color:var(--amber);width:11px;height:11px;margin:0;vertical-align:middle;}.caveat.struck{opacity:.3;text-decoration:line-through;}.caveat.edited{color:var(--ink);font-style:normal;border-left-color:var(--blue);}
+.cav-tools{display:inline-flex;gap:6px;flex-shrink:0;}
+.cav-e,.cav-x{font-family:'Newsreader',serif;font-size:11px;padding:2px 9px;background:transparent;border-radius:3px;cursor:pointer;white-space:nowrap;}
+.cav-e{color:var(--blue);border:1px solid var(--blue);}.cav-e:hover{background:var(--blue);color:#F5F0E6;}
+.cav-x{color:var(--amber);border:1px solid var(--amber);}.cav-x:hover{background:var(--amber);color:#F5F0E6;}
+.cav-edit{display:none;margin:8px 0 4px;}
+.cav-ta{width:100%;font-family:'Newsreader',serif;font-size:13px;line-height:1.5;padding:8px 10px;border:1px solid var(--blue);border-radius:4px;background:#FDFAF5;color:var(--ink);resize:vertical;min-height:62px;}
+.cav-ta:focus{outline:none;}
+.cav-eb{display:flex;gap:6px;margin-top:6px;}
+.cav-save{font-family:'Newsreader',serif;font-size:12px;padding:5px 13px;background:var(--blue);color:#F5F0E6;border:none;border-radius:3px;cursor:pointer;}
+.cav-cancel{font-family:'Newsreader',serif;font-size:12px;padding:5px 13px;background:transparent;color:var(--ink-soft);border:1px solid var(--line);border-radius:3px;cursor:pointer;}
+.cav-why{display:none;margin:8px 0 2px;padding-top:8px;border-top:1px dashed var(--line);}
+.cav-why-lbl{display:block;font-size:11px;color:var(--ink-soft);margin-bottom:6px;}
+.cav-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.cav-chip{font-family:'Newsreader',serif;font-size:12px;padding:3px 10px;background:transparent;border:1px solid var(--line);border-radius:999px;cursor:pointer;color:var(--ink-soft);}
+.cav-chip:hover{border-color:var(--amber);color:var(--amber);}
+.cav-chip.on{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);}
+.cav-reason{width:100%;font-family:'Newsreader',serif;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:#FDFAF5;color:var(--ink);}
+.cav-reason:focus{outline:none;border-color:var(--amber);}
 .meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
 .sig{font-size:11px;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;}
 .s-strong{background:var(--blue-soft);color:var(--blue);}
@@ -221,14 +249,45 @@ function pendSkip(id){
   if(!card)return;
   card.classList.toggle('skip-pending');
 }
+function showWhy(id){var w=document.getElementById('cw-'+id);if(w)w.style.display='block';}
+function maybeHideWhy(id){var card=document.getElementById('c-'+id);if(!card)return;if(card.dataset.dropcav!=='1'&&card.dataset.cavedit!=='1'){var w=document.getElementById('cw-'+id);if(w)w.style.display='none';}}
 function toggleCav(id){
   const card=document.getElementById('c-'+id);
   const cv=document.getElementById('cv-'+id);
   const btn=document.getElementById('cx-'+id);
   if(!card)return;
   const off=card.dataset.dropcav==='1';
-  if(off){card.dataset.dropcav='';if(cv)cv.classList.remove('struck');if(btn)btn.innerHTML='&#10007; Disapprove';}
-  else{card.dataset.dropcav='1';if(cv)cv.classList.add('struck');if(btn)btn.innerHTML='&#8635; Restore disclaimer';}
+  if(off){card.dataset.dropcav='';if(cv)cv.classList.remove('struck');if(btn)btn.innerHTML='&#10007; Disapprove';maybeHideWhy(id);}
+  else{card.dataset.dropcav='1';if(cv)cv.classList.add('struck');if(btn)btn.innerHTML='&#8635; Restore disclaimer';
+    // disapproving cancels any in-progress edit
+    card.dataset.cavedit='';var ce=document.getElementById('ce-'+id);if(ce)ce.style.display='none';
+    showWhy(id);}
+}
+function editCav(id){
+  const card=document.getElementById('c-'+id);if(!card)return;
+  // editing un-disapproves
+  if(card.dataset.dropcav==='1')toggleCav(id);
+  const ce=document.getElementById('ce-'+id);const cv=document.getElementById('cv-'+id);
+  if(ce)ce.style.display='block';if(cv)cv.style.display='none';
+  const ta=document.getElementById('ct-'+id);if(ta){ta.focus();}
+}
+function saveCav(id){
+  const card=document.getElementById('c-'+id);const ta=document.getElementById('ct-'+id);const cv=document.getElementById('cv-'+id);const ce=document.getElementById('ce-'+id);
+  if(!card||!ta)return;
+  const v=ta.value.trim();
+  card.dataset.cavedit='1';
+  if(cv){cv.textContent=v;cv.style.display='';cv.classList.remove('struck');cv.classList.add('edited');}
+  if(ce)ce.style.display='none';
+  showWhy(id);
+}
+function cancelCav(id){
+  const ce=document.getElementById('ce-'+id);const cv=document.getElementById('cv-'+id);
+  if(ce)ce.style.display='none';if(cv)cv.style.display='';
+  maybeHideWhy(id);
+}
+function pickReason(id,btn,text){
+  const ri=document.getElementById('cwr-'+id);if(ri)ri.value=text;
+  var chips=btn.parentNode.querySelectorAll('.cav-chip');chips.forEach(function(c){c.classList.remove('on');});btn.classList.add('on');
 }
 async function act(id,token,action,skipReason,forceDrop){
   const card=document.getElementById('c-'+id);
@@ -237,7 +296,14 @@ async function act(id,token,action,skipReason,forceDrop){
   card.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
-    if(action==='approve'||action==='hero'){url+='&confirmed=1';if(forceDrop||card.dataset.dropcav==='1')url+='&drop_caveat=1';}
+    if(action==='approve'||action==='hero'){
+      url+='&confirmed=1';
+      const drop=forceDrop||card.dataset.dropcav==='1';
+      if(drop)url+='&drop_caveat=1';
+      else if(card.dataset.cavedit==='1'){const ta=document.getElementById('ct-'+id);if(ta)url+='&caveat='+encodeURIComponent(ta.value.trim());}
+      const ri=document.getElementById('cwr-'+id);const rsn=ri?ri.value.trim():'';
+      if(rsn)url+='&caveat_reason='+encodeURIComponent(rsn);
+    }
     if(action==='skip')url+='&skip_reason='+encodeURIComponent(skipReason||'');
     const resp=await fetch(url);
     if(!resp.ok){
