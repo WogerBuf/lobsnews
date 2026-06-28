@@ -52,7 +52,7 @@ export async function onRequestGet(context) {
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
       + (s.caveat ? '<div class="cav-block" id="cb-' + id + '">'
-        + '<div class="cav-hd"><span class="lbl lbl-a">What it does not mean</span>'
+        + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span>'
         + '<span class="cav-tools"><button class="cav-e" onclick="editCav(\'' + id + '\')">&#9998; Edit</button>'
         + '<button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></span></div>'
         + '<p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p>'
