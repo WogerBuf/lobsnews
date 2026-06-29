@@ -5,10 +5,12 @@ export async function onRequestGet(context) {
 
   const url = new URL(context.request.url);
   const urlToken = url.searchParams.get('t');
-  const isAuthed = urlToken === ADMIN_TOKEN;
+  const isAdmin = urlToken === ADMIN_TOKEN;
 
   let serverStories = null;
-  if (isAuthed) {
+  let editorMode = false;
+  let editorInfo = null;
+  if (isAdmin) {
     try {
       const r = await fetch(API, {
         method: 'POST',
@@ -18,7 +20,18 @@ export async function onRequestGet(context) {
       const d = await r.json();
       if (d.ok) serverStories = d.stories || [];
     } catch (_) {}
+  } else if (urlToken) {
+    try {
+      const r = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ editor_token: urlToken, action: 'pending' })
+      });
+      const d = await r.json();
+      if (d.ok) { editorMode = true; editorInfo = d.editor || null; serverStories = d.stories || []; }
+    } catch (_) {}
   }
+  const isAuthed = isAdmin || editorMode;
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -37,6 +50,14 @@ export async function onRequestGet(context) {
     if (l.includes('mod')) return 'd-m';
     return '';
   }
+  function editorBadge(s) {
+    const who = esc(s.assigned_editor || 'editor');
+    const note = s.editor_note ? '<span class="ed-note">&ldquo;' + esc(s.editor_note) + '&rdquo;</span>' : '';
+    if (s.editor_status === 'with_editor') return '<div class="ed-badge ed-sent">&#8618; Sent to ' + who + ' for review</div>';
+    if (s.editor_status === 'editor_approved') return '<div class="ed-badge ed-appr">&#10003; ' + who + ' approved &mdash; awaiting your sign-off' + note + '</div>';
+    if (s.editor_status === 'editor_skipped') return '<div class="ed-badge ed-skip">&#10007; ' + who + ' skipped' + note + '</div>';
+    return '';
+  }
   function renderCard(s) {
     const isPol = (s.review_reason || '').toLowerCase().startsWith('political');
     const polFlag = isPol ? '<div class="pol-flag">&#9888; Political content &mdash; editorial approval sought</div>' : '';
@@ -48,24 +69,33 @@ export async function onRequestGet(context) {
     return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '">'
       + '<div class="done-badge" id="b-' + id + '"></div>'
       + polFlag
+      + (!editorMode && s.editor_status ? editorBadge(s) : '')
       + '<div class="cat">' + esc(s.category || '') + '</div>'
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
-      + (s.caveat ? '<div class="cav-block" id="cb-' + id + '">'
-        + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span>'
-        + '<span class="cav-tools"><button class="cav-e" onclick="editCav(\'' + id + '\')">&#9998; Edit</button>'
-        + '<button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></span></div>'
-        + '<p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p>'
-        + '<div class="cav-edit" id="ce-' + id + '"><textarea class="cav-ta" id="ct-' + id + '">' + esc(s.caveat) + '</textarea>'
-        + '<div class="cav-eb"><button class="cav-save" onclick="saveCav(\'' + id + '\')">Save edit</button><button class="cav-cancel" onclick="cancelCav(\'' + id + '\')">Cancel</button></div></div>'
-        + '<div class="cav-why" id="cw-' + id + '"><span class="cav-why-lbl">Why? &mdash; optional, helps it learn</span><div class="cav-chips">'
-        + ['too cynical','inaccurate','not needed here','wrong emphasis'].map(r => '<button type="button" class="cav-chip" onclick="pickReason(\'' + id + '\',this,\'' + r + '\')">' + r + '</button>').join('')
-        + '</div><input class="cav-reason" id="cwr-' + id + '" type="text" placeholder="…or type your reason"></div>'
-        + '</div>' : '')
+      + (s.caveat
+        ? '<div class="cav-block" id="cb-' + id + '">'
+          + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span>'
+          + '<span class="cav-tools"><button class="cav-e" onclick="editCav(\'' + id + '\')">&#9998; Edit</button>'
+          + '<button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></span></div>'
+          + '<p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p>'
+          + '<div class="cav-edit" id="ce-' + id + '"><textarea class="cav-ta" id="ct-' + id + '">' + esc(s.caveat) + '</textarea>'
+          + '<div class="cav-eb"><button class="cav-save" onclick="saveCav(\'' + id + '\')">Save edit</button><button class="cav-cancel" onclick="cancelCav(\'' + id + '\')">Cancel</button></div></div>'
+          + '<div class="cav-why" id="cw-' + id + '"><span class="cav-why-lbl">Why? &mdash; optional, helps it learn</span><div class="cav-chips">'
+          + ['too cynical','inaccurate','not needed here','wrong emphasis'].map(r => '<button type="button" class="cav-chip" onclick="pickReason(\'' + id + '\',this,\'' + r + '\')">' + r + '</button>').join('')
+          + '</div><input class="cav-reason" id="cwr-' + id + '" type="text" placeholder="…or type your reason"></div>'
+          + '</div>'
+        : '<div class="cav-block" id="cb-' + id + '">'
+          + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span>'
+          + '<span class="cav-tools"><button class="cav-e" onclick="addCav(\'' + id + '\')">&#9998; Add a note</button></span></div>'
+          + '<p class="caveat" id="cv-' + id + '" style="display:none;"></p>'
+          + '<div class="cav-edit" id="ce-' + id + '"><textarea class="cav-ta" id="ct-' + id + '" placeholder="Add a Worth noting note (optional)"></textarea>'
+          + '<div class="cav-eb"><button class="cav-save" onclick="saveCav(\'' + id + '\')">Save</button><button class="cav-cancel" onclick="cancelAddCav(\'' + id + '\')">Cancel</button></div></div>'
+          + '</div>')
       + '<div class="meta">' + sig + conf + '</div>'
       + '<div class="actions">'
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
-      + '<button class="btn-h" onclick="act(\'' + id + '\',\'' + tok + '\',\'hero\')">&#9733; Hero</button>'
+      + (editorMode ? '' : '<button class="btn-h" onclick="act(\'' + id + '\',\'' + tok + '\',\'hero\')">&#9733; Hero</button>')
       + '<button class="btn-s" onclick="pendSkip(\'' + id + '\')">&#10007; Skip &#9660;</button>'
       + '<button class="btn-l" onclick="act(\'' + id + '\',\'' + tok + '\',\'defer\',\'\')">&#8635; Later</button>'
       + '<a class="src" href="' + src + '" target="_blank" rel="noopener">' + esc(s.source_name || 'Source') + ' &#8599;</a>'
@@ -110,6 +140,9 @@ export async function onRequestGet(context) {
   const reviewScreenStyle = isAuthed ? '' : 'display:none;';
   const gateScreenStyle = isAuthed ? 'display:none;' : '';
   const initialCount = sorted.length;
+  const editorBanner = editorMode
+    ? '<div class="ed-banner"><b>Editorial review &mdash; ' + esc(((editorInfo && editorInfo.categories) || []).join(', ')) + '</b><br>Hi ' + esc((editorInfo && editorInfo.name) || 'there') + ' &mdash; approve, edit or add a &ldquo;Worth noting&rdquo;, recategorize, or skip. Your decisions go to the editor for final sign-off before anything publishes.</div>'
+    : '';
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -214,6 +247,13 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .gate input:focus{outline:none;border-color:var(--blue);}
 .gate button{width:100%;font-family:'Newsreader',serif;font-size:16px;padding:10px;background:var(--blue);color:#F5F0E6;border:none;border-radius:4px;cursor:pointer;}
 .gate-err{color:var(--amber);font-size:14px;margin-top:8px;min-height:20px;}
+.ed-banner{background:var(--blue-soft);border:1px solid var(--blue);border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:14px;color:var(--ink);line-height:1.5;}
+.ed-banner b{color:var(--blue);}
+.ed-badge{display:block;border-radius:3px;padding:5px 9px;margin-bottom:9px;font-size:11px;font-weight:600;letter-spacing:.4px;}
+.ed-sent{background:rgba(43,75,120,.10);color:var(--blue);}
+.ed-appr{background:var(--amber-soft);color:var(--amber);}
+.ed-skip{background:rgba(88,80,63,.10);color:var(--ink-soft);}
+.ed-note{display:block;font-style:italic;font-weight:400;margin-top:3px;color:var(--ink-soft);}
 </style>
 </head>
 <body>
@@ -230,13 +270,15 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
   </div>
 </div>
 <div id="review-screen" class="wrap" style="${reviewScreenStyle}">
+  ${editorBanner}
   <p class="status" id="status-msg">${esc(statusText)}</p>
-  ${initialCount > 0 ? '<div id="bulk-bar"><span class="bulk-lbl">All remaining:</span><button class="ba" onclick="bulkApprove(false)">&#10003; Approve all</button><button class="bnd" onclick="bulkApprove(true)">&#10003; Approve all &middot; no disclaimers</button></div>' : ''}
+  ${initialCount > 0 && !editorMode ? '<div id="bulk-bar"><span class="bulk-lbl">All remaining:</span><button class="ba" onclick="bulkApprove(false)">&#10003; Approve all</button><button class="bnd" onclick="bulkApprove(true)">&#10003; Approve all &middot; no disclaimers</button></div>' : ''}
   <div id="stories">${storiesHtml}</div>
 </div>
 <script>
 const APPROVE='${APPROVE}';
-let TOKEN='${isAuthed ? ADMIN_TOKEN : ''}';
+let TOKEN='${isAdmin ? ADMIN_TOKEN : ''}';
+const AS_EDITOR='${editorMode ? urlToken : ''}';
 let remaining=${initialCount};
 function updateCounter(){
   const c=document.getElementById('counter');
@@ -285,6 +327,8 @@ function cancelCav(id){
   if(ce)ce.style.display='none';if(cv)cv.style.display='';
   maybeHideWhy(id);
 }
+function addCav(id){var ce=document.getElementById('ce-'+id);if(ce)ce.style.display='block';var ta=document.getElementById('ct-'+id);if(ta)ta.focus();}
+function cancelAddCav(id){var card=document.getElementById('c-'+id);if(card)card.dataset.cavedit='';var ce=document.getElementById('ce-'+id);if(ce)ce.style.display='none';var cv=document.getElementById('cv-'+id);if(cv){cv.style.display='none';cv.textContent='';}}
 function pickReason(id,btn,text){
   const ri=document.getElementById('cwr-'+id);if(ri)ri.value=text;
   var chips=btn.parentNode.querySelectorAll('.cav-chip');chips.forEach(function(c){c.classList.remove('on');});btn.classList.add('on');
@@ -296,6 +340,7 @@ async function act(id,token,action,skipReason,forceDrop){
   card.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
+    if(AS_EDITOR)url+='&as_editor='+encodeURIComponent(AS_EDITOR);
     if(action==='approve'||action==='hero'){
       url+='&confirmed=1';
       const drop=forceDrop||card.dataset.dropcav==='1';
@@ -314,7 +359,7 @@ async function act(id,token,action,skipReason,forceDrop){
     card.classList.remove('skip-pending');
     const outcome=(action==='approve'||action==='hero')?'approved':action==='defer'?'deferred':'skipped';
     card.classList.add('done',outcome);
-    const label=action==='hero'?'★ Hero':action==='approve'?'✓ Approved':action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
+    const label=action==='hero'?'★ Hero':action==='approve'?(AS_EDITOR?'✓ Sent for sign-off':'✓ Approved'):action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
     badge.innerHTML=label+'<button class="undo-btn" data-id="'+id+'" data-tok="'+token+'" onclick="undoAct(this.dataset.id,this.dataset.tok)">↩ Undo</button>';
     remaining=Math.max(0,remaining-1);
     updateCounter();
