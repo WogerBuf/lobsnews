@@ -59,6 +59,15 @@ export async function onRequestGet(context) {
     if (s.editor_status === 'editor_skipped') return '<div class="ed-badge ed-skip">&#10007; ' + who + ' skipped' + note + '</div>';
     return '';
   }
+  const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Politics'];
+  function catSelect(s, id) {
+    const cur = s.category || '';
+    const opts = CATS.slice();
+    if (cur && !opts.includes(cur)) opts.unshift(cur);
+    return '<select class="cat-sel" id="cat-' + id + '" title="Change category">'
+      + opts.map(c => '<option' + (c === cur ? ' selected' : '') + '>' + esc(c) + '</option>').join('')
+      + '</select>';
+  }
   function renderCard(s) {
     const isPol = (s.review_reason || '').toLowerCase().startsWith('political');
     const polFlag = isPol ? '<div class="pol-flag">&#9888; Political content &mdash; editorial approval sought</div>' : '';
@@ -71,7 +80,7 @@ export async function onRequestGet(context) {
       + '<div class="done-badge" id="b-' + id + '"></div>'
       + polFlag
       + (!editorMode && s.editor_status ? editorBadge(s) : '')
-      + '<div class="cat">' + esc(s.category || '') + '</div>'
+      + '<div class="cat">' + catSelect(s, id) + '</div>'
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
       + (s.caveat
@@ -174,6 +183,9 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .card.skipped{border-color:var(--amber);}
 .pol-flag{background:#FFF3CD;border:1px solid #FFCC00;border-radius:3px;padding:6px 10px;margin-bottom:10px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#856404;}
 .cat{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:7px;}
+.cat-sel{font-family:'Newsreader',serif;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;background:#FDFAF5;border:1px solid var(--line);border-radius:3px;padding:2px 6px;cursor:pointer;max-width:100%;}
+.cat-sel:focus{outline:none;border-color:var(--blue);}
+.cat-sel:hover{border-color:var(--blue);color:var(--blue);}
 .hl{font-family:'Fraunces',serif;font-weight:500;font-size:19px;line-height:1.25;margin-bottom:9px;}
 .hl a{color:inherit;text-decoration:none;}
 .hl a:hover{text-decoration:underline;text-decoration-color:var(--blue);}
@@ -357,6 +369,7 @@ async function act(id,token,action,skipReason,forceDrop){
       else if(card.dataset.cavedit==='1'){const ta=document.getElementById('ct-'+id);if(ta)url+='&caveat='+encodeURIComponent(ta.value.trim());}
       const ri=document.getElementById('cwr-'+id);const rsn=ri?ri.value.trim():'';
       if(rsn)url+='&caveat_reason='+encodeURIComponent(rsn);
+      const catSel=document.getElementById('cat-'+id);if(catSel&&catSel.value)url+='&category='+encodeURIComponent(catSel.value);
     }
     if(action==='skip')url+='&skip_reason='+encodeURIComponent(skipReason||'');
     const resp=await fetch(url);
