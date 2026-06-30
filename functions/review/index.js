@@ -1,35 +1,36 @@
 export async function onRequestGet(context) {
-  const ADMIN_TOKEN = "7af0d91c1af641fd9087c6f7416072a6d9af53a157a141b4891827d921d495a4";
   const API = "https://qvmewmebcrkmyutvbzxv.functions.supabase.co/goodlede-admin";
   const APPROVE = "/approve";
 
   const url = new URL(context.request.url);
   const urlToken = url.searchParams.get('t');
-  const isAdmin = urlToken === ADMIN_TOKEN;
 
+  // No secret in source: validate whatever token is in the URL against the server (admin first, then editor).
   let serverStories = null;
+  let isAdmin = false;
   let editorMode = false;
   let editorInfo = null;
-  if (isAdmin) {
+  if (urlToken) {
     try {
       const r = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: ADMIN_TOKEN, action: 'pending' })
+        body: JSON.stringify({ token: urlToken, action: 'pending' })
       });
       const d = await r.json();
-      if (d.ok) serverStories = d.stories || [];
+      if (d.ok) { isAdmin = true; serverStories = d.stories || []; }
     } catch (_) {}
-  } else if (urlToken) {
-    try {
-      const r = await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ editor_token: urlToken, action: 'pending' })
-      });
-      const d = await r.json();
-      if (d.ok) { editorMode = true; editorInfo = d.editor || null; serverStories = d.stories || []; }
-    } catch (_) {}
+    if (!isAdmin) {
+      try {
+        const r = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ editor_token: urlToken, action: 'pending' })
+        });
+        const d = await r.json();
+        if (d.ok) { editorMode = true; editorInfo = d.editor || null; serverStories = d.stories || []; }
+      } catch (_) {}
+    }
   }
   const isAuthed = isAdmin || editorMode;
 
@@ -277,7 +278,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 </div>
 <script>
 const APPROVE='${APPROVE}';
-let TOKEN='${isAdmin ? ADMIN_TOKEN : ''}';
+let TOKEN='${isAdmin ? urlToken : ''}';
 const AS_EDITOR='${editorMode ? urlToken : ''}';
 let remaining=${initialCount};
 function updateCounter(){
