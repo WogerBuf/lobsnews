@@ -353,7 +353,7 @@ async function act(id,token,action,skipReason,forceDrop){
       url+='&confirmed=1';
       const drop=forceDrop||card.dataset.dropcav==='1';
       if(drop)url+='&drop_caveat=1';
-      else{const ce=document.getElementById('ce-'+id);const ta=document.getElementById('ct-'+id);const editOpen=ce&&ce.style.display==='block';if((card.dataset.cavedit==='1'||editOpen)&&ta){const v=ta.value.trim();if(v)url+='&caveat='+encodeURIComponent(v);}}
+      else if(card.dataset.cavedit==='1'){const ta=document.getElementById('ct-'+id);if(ta)url+='&caveat='+encodeURIComponent(ta.value.trim());}
       const ri=document.getElementById('cwr-'+id);const rsn=ri?ri.value.trim():'';
       if(rsn)url+='&caveat_reason='+encodeURIComponent(rsn);
     }
