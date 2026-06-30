@@ -71,6 +71,12 @@ export async function onRequestGet(context) {
   function renderCard(s) {
     const isPol = (s.review_reason || '').toLowerCase().startsWith('political');
     const polFlag = isPol ? '<div class="pol-flag">&#9888; Political content &mdash; editorial approval sought</div>' : '';
+    const dupFlag = (s.dup_status === 'possible' && s.dup_of_headline)
+      ? '<div class="dup-flag"><span class="dup-lbl">&#9888; Possible duplicate</span> &mdash; looks like the same story as already published: &ldquo;'
+        + esc(s.dup_of_headline) + '&rdquo;'
+        + (s.dup_of_id ? ' &middot; <a href="https://goodlede.com/story/' + esc(s.dup_of_id) + '" target="_blank" rel="noopener">view the live one &#8599;</a>' : '')
+        + '</div>'
+      : '';
     const sig = s.significance ? '<span class="sig ' + sigCls(s.significance) + '">' + esc(s.significance) + '</span>' : '';
     const conf = s.confidence ? '<span class="conf"><span class="dot ' + dotCls(s.confidence) + '"></span>' + esc(s.confidence) + '</span>' : '';
     const id = esc(s.id);
@@ -78,6 +84,7 @@ export async function onRequestGet(context) {
     const src = esc(s.source_url || '#');
     return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '">'
       + '<div class="done-badge" id="b-' + id + '"></div>'
+      + dupFlag
       + polFlag
       + (!editorMode && s.editor_status ? editorBadge(s) : '')
       + '<div class="cat">' + catSelect(s, id) + '</div>'
@@ -134,6 +141,9 @@ export async function onRequestGet(context) {
 
   if (isAuthed && serverStories !== null) {
     sorted = [...serverStories].sort((a, b) => {
+      const ad = a.dup_status === 'possible' ? 1 : 0;
+      const bd = b.dup_status === 'possible' ? 1 : 0;
+      if (ad !== bd) return bd - ad; // possible-duplicates float to the top
       const ap = (a.review_reason || '').toLowerCase().startsWith('political');
       const bp = (b.review_reason || '').toLowerCase().startsWith('political');
       return ap && !bp ? -1 : !ap && bp ? 1 : 0;
@@ -182,6 +192,9 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .card.approved{border-color:var(--blue);}
 .card.skipped{border-color:var(--amber);}
 .pol-flag{background:#FFF3CD;border:1px solid #FFCC00;border-radius:3px;padding:6px 10px;margin-bottom:10px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#856404;}
+.dup-flag{background:#FBE9E7;border:1px solid #E0A89B;border-radius:3px;padding:7px 11px;margin-bottom:10px;font-size:12px;color:#8A3324;line-height:1.45;}
+.dup-flag .dup-lbl{font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:10.5px;}
+.dup-flag a{color:#2B4B78;text-decoration:underline;}
 .cat{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:7px;}
 .cat-sel{font-family:'Newsreader',serif;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;background:#FDFAF5;border:1px solid var(--line);border-radius:3px;padding:2px 6px;cursor:pointer;max-width:100%;}
 .cat-sel:focus{outline:none;border-color:var(--blue);}
