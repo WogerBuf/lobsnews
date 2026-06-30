@@ -337,6 +337,14 @@ async function act(id,token,action,skipReason,forceDrop){
   const card=document.getElementById('c-'+id);
   const badge=document.getElementById('b-'+id);
   if(!card)return;
+  // Guard: don't allow approve/hero over an unsaved "Worth noting" edit.
+  if(action==='approve'||action==='hero'){
+    const ce=document.getElementById('ce-'+id);const ta=document.getElementById('ct-'+id);const cv=document.getElementById('cv-'+id);
+    if(ce&&ce.style.display==='block'&&ta){
+      const typed=ta.value.trim();const shown=cv?cv.textContent.trim():'';
+      if(typed!==shown){alert('You’ve edited the “Worth noting” but haven’t saved it. Click “Save edit” to keep your change (or “Cancel” to discard) before approving.');return;}
+    }
+  }
   card.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
