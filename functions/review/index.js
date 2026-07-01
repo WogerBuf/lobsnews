@@ -56,7 +56,9 @@ export async function onRequestGet(context) {
     const note = s.editor_note ? '<span class="ed-note">&ldquo;' + esc(s.editor_note) + '&rdquo;</span>' : '';
     if (s.editor_status === 'with_editor') return '<div class="ed-badge ed-sent">&#8618; Sent to ' + who + ' for review</div>';
     if (s.editor_status === 'editor_approved') return '<div class="ed-badge ed-appr">&#10003; ' + who + ' approved &mdash; awaiting your sign-off' + note + '</div>';
-    if (s.editor_status === 'editor_skipped') return '<div class="ed-badge ed-skip">&#10007; ' + who + ' skipped' + note + '</div>';
+    if (s.editor_status === 'editor_skipped') return '<div class="ed-badge ed-skip">&#10007; ' + who + ' skipped' + note
+      + '<button type="button" class="ed-accept" data-id="' + esc(s.id) + '" data-tok="' + esc(s.review_token) + '" data-who="' + who + '" data-note="' + esc(s.editor_note || '') + '" onclick="acceptEditorSkip(this)">&#10003; Accept editor’s choice</button>'
+      + '</div>';
     return '';
   }
   const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Politics'];
@@ -280,6 +282,8 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .ed-appr{background:var(--amber-soft);color:var(--amber);}
 .ed-skip{background:rgba(88,80,63,.10);color:var(--ink-soft);}
 .ed-note{display:block;font-style:italic;font-weight:400;margin-top:3px;color:var(--ink-soft);}
+.ed-accept{display:inline-block;margin-top:7px;padding:4px 11px;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.4px;color:#fff;background:var(--ink-soft);border:none;border-radius:3px;cursor:pointer;}
+.ed-accept:hover{background:var(--ink);}
 </style>
 </head>
 <body>
@@ -399,6 +403,12 @@ async function act(id,token,action,skipReason,forceDrop){
     remaining=Math.max(0,remaining-1);
     updateCounter();
   }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);alert('Network error — story NOT updated. Check your connection and try again.');}
+}
+function acceptEditorSkip(btn){
+  var id=btn.dataset.id, tok=btn.dataset.tok, who=btn.dataset.who||'the editor', note=(btn.dataset.note||'').trim();
+  if(!confirm('Honor '+who+'’s skip? This removes the story from your queue'+(note?' and records their reason.':'.')))return;
+  var reason=note?(who+' skip: '+note):(who+' skip accepted');
+  act(id,tok,'skip',reason);
 }
 async function bulkApprove(dropCaveat){
   const cards=[...document.querySelectorAll('#stories .card')].filter(c=>!c.classList.contains('done'));
