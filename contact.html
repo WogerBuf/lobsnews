@@ -7,7 +7,7 @@
 <title>Contact — Goodlede</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
-body{margin:0;font-family:'Newsreader',Georgia,serif;color:#221E18;line-height:1.6;background:#F6F2E9;padding:40px 22px 60px;}
+body{margin:0;font-family:'Newsreader',Georgia,serif;color:#221E18;line-height:1.6;background:#FBF8F1;padding:40px 22px 60px;}
 .wrap{max-width:600px;margin:0 auto;}
 a.home{text-decoration:none;color:#2F5D3A;font-size:14px;}
 .mark{font-family:'Fraunces',serif;font-weight:600;font-size:26px;} .mark2{color:#2F5D3A;}
@@ -17,7 +17,7 @@ label{display:block;font-size:13px;letter-spacing:.4px;text-transform:uppercase;
 input,textarea{width:100%;font-family:'Newsreader',serif;font-size:16px;padding:11px 12px;border:1px solid #D8CFBC;border-radius:4px;background:#FFFDF8;color:#221E18;box-sizing:border-box;}
 input:focus,textarea:focus{outline:none;border-color:#2F5D3A;}
 textarea{min-height:150px;resize:vertical;}
-button{margin-top:18px;font-family:'Newsreader',serif;font-size:16px;padding:11px 22px;border:1px solid #2F5D3A;background:#2F5D3A;color:#F6F2E9;border-radius:4px;cursor:pointer;}
+button{margin-top:18px;font-family:'Newsreader',serif;font-size:16px;padding:11px 22px;border:1px solid #2F5D3A;background:#2F5D3A;color:#FBF8F1;border-radius:4px;cursor:pointer;}
 button:hover{background:#264c30;} button:disabled{opacity:.6;cursor:default;}
 .msg{margin-top:14px;font-size:15px;min-height:20px;} .ok{color:#2F5D3A;} .err{color:#8A4B33;}
 .foot{margin-top:44px;border-top:1px solid #D8CFBC;padding-top:14px;font-size:13px;color:#5A5248;} .foot a{color:#2F5D3A;}
@@ -55,7 +55,12 @@ btn.addEventListener("click", async () => {
   btn.disabled = true; m.textContent = "Sending\u2026"; m.className = "msg";
   try {
     const r = await fetch(`${FUNCTIONS_BASE}/goodlede-contact`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, message }) });
-    if (r.ok) { m.textContent = "Thanks \u2014 your message is in. We'll reply to the address you gave."; m.className = "msg ok"; document.getElementById("message").value = ""; }
+    if (r.ok) {
+      ["email","message","send"].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display="none"; });
+      document.querySelectorAll("label").forEach(function(l){ l.style.display="none"; });
+      m.innerHTML = '<div style="font-size:40px;line-height:1;margin-bottom:12px;">\u2713</div><strong style="font-size:19px;">Message sent \u2014 thank you.</strong><br/><span style="color:var(--ink-soft,#58503F);">We\u2019ve got it and we\u2019ll reply to <b>' + email + '</b>.</span>';
+      m.className = "msg ok"; m.style.fontSize = "16px";
+    }
     else { m.textContent = "Something went wrong sending that. Please try again."; m.className = "msg err"; }
   } catch (_) { m.textContent = "Couldn't reach the server. Please try again."; m.className = "msg err"; }
   btn.disabled = false;
