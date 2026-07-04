@@ -32,6 +32,11 @@ html{overflow-x:hidden;}body{margin:0;-webkit-text-size-adjust:100%;text-size-ad
 .pill{font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);cursor:pointer;transition:all .15s;}
 .pill:hover{border-color:var(--ink);color:var(--ink);} .pill.pill-on,.pill.pill-on:hover{background:var(--ink);color:var(--paper);border-color:var(--ink);}
 .refresh{margin-left:auto;font-family:'Newsreader',serif;font-size:14px;padding:5px 13px;border:1px solid var(--blue);color:var(--blue);background:transparent;border-radius:999px;cursor:pointer;} .refresh:hover{background:var(--blue);color:var(--paper);}
+.searchbar{margin:22px 0 0;display:flex;gap:8px;max-width:540px;}
+.searchbar input{flex:1;min-width:0;font-family:'Newsreader',serif;font-size:15px;padding:9px 15px;border:1px solid var(--line);border-radius:999px;background:#FFFDF8;color:var(--ink);}
+.searchbar input::placeholder{color:var(--ink-faint);}
+.searchbar input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(43,75,120,.10);}
+.searchbar button{font-family:'Newsreader',serif;font-size:14px;padding:9px 20px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;flex-shrink:0;} .searchbar button:hover{filter:brightness(1.12);}
 .grid>.card:first-child{grid-column:1/-1;}.grid>.card:first-child .hl{font-size:27px;line-height:1.18;}.grid>.card:first-child .basis,.grid>.card:first-child .caveat{font-size:14.5px;}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;}
 .card{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:20px 20px 16px;display:flex;flex-direction:column;}
 .cthumb{margin:-20px -20px 14px;overflow:hidden;border-radius:4px 4px 0 0;border-bottom:1px solid var(--line);background:var(--paper);line-height:0;}
@@ -175,6 +180,7 @@ html{scroll-behavior:smooth;}
   <div class="rule"></div>
   <p class="standard">The good that's easy to miss, from anywhere in the world &mdash; the environment and the creatures in it, people being good to each other, science and health that helps, hard-won human feats, real progress on fairness, and the small player beating the giant. No politics. Two checks before anything appears: one finds it, a second re-verifies it against a reputable source and throws out whatever&rsquo;s overblown or unproven. What&rsquo;s left says what happened, what backs it, and, where we think it might be helpful, <em>what&rsquo;s worth noting.</em></p>
   <div id="banner"></div>
+  <div class="searchbar" id="searchbar"><input id="searchInput" type="search" placeholder="Search good news &mdash; a topic, place, or source&hellip;" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Search stories"/><button id="searchBtn">Search</button></div>
   <div class="filters" id="filters"></div>
   <div id="content"><div class="loading"><div class="spin"></div><p>Loading the latest\u2026</p></div></div>
   <p class="note" id="note"></p>
@@ -460,7 +466,37 @@ function wireNudge(){
   },{passive:true});
 }
 
-(function init(){ setVersion();setDateline(); showApp(); loadFeed(); wireSharing(); wireNudge(); })();
+async function doSearch(q){
+  q=(q||"").trim();
+  if(!q){clearSearch();return;}
+  document.getElementById("content").innerHTML='<div class="loading"><div class="spin"></div><p>Searching…</p></div>';
+  document.getElementById("banner").innerHTML="";
+  try{
+    const r=await fetch(FUNCTIONS_BASE+"/goodlede-feed",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({q:q})});
+    if(!r.ok) throw new Error("search "+r.status);
+    const d=await r.json();
+    const items=d.stories||[];
+    render(items,false);
+    const n=items.length;
+    const more=n>=60?"the first 60 ":"";
+    document.getElementById("banner").innerHTML='<div class="banner" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">'
+      +'<span>'+(n?('Showing '+more+'<strong>'+n+'</strong> result'+(n===1?'':'s')+' for “'+esc(q)+'”'):('No stories match “'+esc(q)+'” yet'))+'</span>'
+      +'<button type="button" onclick="clearSearch()" style="font-family:\'Newsreader\',serif;font-size:13px;padding:4px 13px;border:1px solid var(--blue);color:var(--blue);background:transparent;border-radius:999px;cursor:pointer;">Clear search</button></div>';
+    if(!n) document.getElementById("content").innerHTML='<div class="loading"><p>Nothing matched. Try a topic, place, or source.</p></div>';
+    var sb=document.getElementById("searchbar"); if(sb) sb.scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){
+    document.getElementById("banner").innerHTML='<div class="banner">Search couldn’t run ('+esc(e.message)+'). Please try again.</div>';
+  }
+}
+function clearSearch(){var si=document.getElementById("searchInput");if(si)si.value="";document.getElementById("banner").innerHTML="";loadFeed();}
+function wireSearch(){
+  var inp=document.getElementById("searchInput"),btn=document.getElementById("searchBtn");
+  if(!inp||!btn||btn.dataset.wired)return; btn.dataset.wired="1";
+  btn.addEventListener("click",function(){doSearch(inp.value);});
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doSearch(inp.value);}});
+  inp.addEventListener("search",function(){if(!inp.value.trim())clearSearch();});
+}
+(function init(){ setVersion();setDateline(); showApp(); loadFeed(); wireSharing(); wireNudge(); wireSearch(); })();
 </script>
 
 <!-- Donate Modal -->
