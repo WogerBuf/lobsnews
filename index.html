@@ -423,13 +423,13 @@ function wireNudge(){
     shown=true;
     var n=document.createElement('div');
     n.id='sub-nudge';
-    n.style.cssText='position:fixed;bottom:0;left:0;right:0;background:var(--paper-2);border-top:2px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.10);';
+    n.style.cssText='position:fixed;bottom:0;left:0;right:0;background:var(--paper-2);border-top:2px solid var(--ink);padding:14px 52px 14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.10);';
     n.innerHTML='<span style="font-family:\'Fraunces\',serif;font-size:16px;flex:1;min-width:160px;">Want good news in your inbox daily?</span>'
       +'<div style="display:flex;gap:8px;flex:1;min-width:220px;">'
       +'<input id="nudge-email" type="email" placeholder="you@example.com" autocomplete="email" inputmode="email" style="flex:1;font-family:\'Newsreader\',serif;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:#FFFDF8;color:var(--ink);min-width:0;">'
       +'<button id="nudge-sub-btn" style="font-family:\'Newsreader\',serif;font-size:15px;padding:8px 16px;background:var(--blue);color:var(--paper);border:none;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Subscribe</button>'
       +'</div>'
-      +'<button id="nudge-close" style="background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;padding:2px 6px;line-height:1;flex-shrink:0;">&times;</button>';
+      +'<button id="nudge-close" aria-label="Dismiss" style="position:absolute;top:6px;right:6px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:none;border:none;font-size:26px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:0;flex-shrink:0;">&times;</button>';
     document.body.appendChild(n);
     var setPad=function(){document.body.style.paddingBottom=n.offsetHeight+'px';};
     setPad();window.addEventListener('resize',setPad);
@@ -447,7 +447,7 @@ function wireNudge(){
         var ok=await subscribe(e);
         if(ok){
           localStorage.setItem('goodlede_subscribed','1');
-          n.innerHTML='<span style="font-family:\'Fraunces\',serif;font-size:16px;color:var(--blue);flex:1;">You\'re on the list. Thanks!</span><button id="nudge-ty-x" style="background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;padding:2px 6px;">&times;</button>';
+          n.innerHTML='<span style="font-family:\'Fraunces\',serif;font-size:16px;color:var(--blue);flex:1;">You\'re on the list. Thanks!</span><button id="nudge-ty-x" aria-label="Dismiss" style="position:absolute;top:6px;right:6px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:none;border:none;font-size:26px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:0;">&times;</button>';
           document.getElementById('nudge-ty-x').addEventListener('click',function(){removeNudge();});
           setTimeout(function(){removeNudge();},4000);
         } else {btn2.textContent='Try again';btn2.disabled=false;}
