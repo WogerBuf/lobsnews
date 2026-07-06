@@ -84,7 +84,7 @@ export async function onRequestGet(context) {
     const id = esc(s.id);
     const tok = esc(s.review_token);
     const src = esc(s.source_url || '#');
-    return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '">'
+    return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '" data-origcat="' + esc(s.category || '') + '">'
       + '<div class="done-badge" id="b-' + id + '"></div>'
       + dupFlag
       + polFlag
@@ -114,6 +114,7 @@ export async function onRequestGet(context) {
       + '<div class="meta">' + sig + conf + '</div>'
       + '<div class="actions">'
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
+      + (editorMode ? '<button class="btn-r" onclick="act(\'' + id + '\',\'' + tok + '\',\'return\')" title="Change the category above, then send this to the editor-in-chief’s next digest instead of publishing">&#8617; Recategorize &amp; send back</button>' : '')
       + (editorMode ? '' : '<button class="btn-h" onclick="act(\'' + id + '\',\'' + tok + '\',\'hero\')">&#9733; Hero</button>')
       + '<button class="btn-s" onclick="pendSkip(\'' + id + '\')">&#10007; Skip &#9660;</button>'
       + '<button class="btn-l" onclick="act(\'' + id + '\',\'' + tok + '\',\'defer\',\'\')">&#8635; Later</button>'
@@ -191,6 +192,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .done-badge{display:none;position:absolute;top:0;left:0;right:0;bottom:0;border-radius:6px;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:22px;font-weight:600;letter-spacing:-.3px;}
 .card.approved .done-badge{display:flex;background:rgba(43,75,120,.13);color:var(--blue);}
 .card.skipped .done-badge{display:flex;background:rgba(143,97,21,.11);color:var(--amber);}
+.card.returned .done-badge{display:flex;background:rgba(43,75,120,.13);color:var(--blue);}
 .card.approved{border-color:var(--blue);}
 .card.skipped{border-color:var(--amber);}
 .pol-flag{background:#FFF3CD;border:1px solid #FFCC00;border-radius:3px;padding:6px 10px;margin-bottom:10px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#856404;}
@@ -243,6 +245,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .btn-l{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:transparent;color:var(--ink-soft);border:1px solid var(--line);border-radius:4px;cursor:pointer;}
 .btn-l:hover{background:var(--ink-soft);color:#F5F0E6;border-color:var(--ink-soft);}
 .btn-h{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:var(--amber);color:#F5F0E6;border:none;border-radius:4px;cursor:pointer;}
+.btn-r{font-family:'Newsreader',serif;font-size:15px;padding:8px 18px;background:transparent;color:var(--blue);border:1px solid var(--blue);border-radius:4px;cursor:pointer;} .btn-r:hover{background:var(--blue);color:#F5F0E6;}
 .btn-h:hover{background:#6b470f;}
 .btn-nd{font-family:'Newsreader',serif;font-size:15px;padding:8px 16px;background:transparent;color:var(--blue);border:1px dashed var(--blue);border-radius:4px;cursor:pointer;}
 .btn-nd:hover{background:var(--blue);color:#F5F0E6;}
@@ -379,6 +382,7 @@ async function act(id,token,action,skipReason,forceDrop){
   try{
     let url=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action='+action;
     if(AS_EDITOR)url+='&as_editor='+encodeURIComponent(AS_EDITOR);
+    if(action==='return'){const catSel=document.getElementById('cat-'+id);if(catSel&&catSel.value)url+='&category='+encodeURIComponent(catSel.value);}
     if(action==='approve'||action==='hero'){
       url+='&confirmed=1';
       const drop=forceDrop||card.dataset.dropcav==='1';
@@ -396,9 +400,9 @@ async function act(id,token,action,skipReason,forceDrop){
       return;
     }
     card.classList.remove('skip-pending');
-    const outcome=(action==='approve'||action==='hero')?'approved':action==='defer'?'deferred':'skipped';
+    const outcome=(action==='approve'||action==='hero')?'approved':action==='defer'?'deferred':action==='return'?'returned':'skipped';
     card.classList.add('done',outcome);
-    const label=action==='hero'?'★ Hero':action==='approve'?(AS_EDITOR?'✓ Sent for sign-off':'✓ Approved'):action==='defer'?'↻ Back tomorrow':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
+    const label=action==='hero'?'★ Hero':action==='approve'?(AS_EDITOR?'✓ Sent for sign-off':'✓ Approved'):action==='defer'?'↻ Back tomorrow':action==='return'?'↩ Sent to editor-in-chief':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
     badge.innerHTML=label+'<button class="undo-btn" data-id="'+id+'" data-tok="'+token+'" onclick="undoAct(this.dataset.id,this.dataset.tok)">↩ Undo</button>';
     remaining=Math.max(0,remaining-1);
     updateCounter();
@@ -422,9 +426,11 @@ async function undoAct(id,token){
   const card=document.getElementById('c-'+id);
   const badge=document.getElementById('b-'+id);
   if(!card)return;
-  const resp=await fetch(APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action=undo');
+  let u=APPROVE+'?id='+encodeURIComponent(id)+'&token='+encodeURIComponent(token)+'&action=undo';
+  if(AS_EDITOR){u+='&as_editor='+encodeURIComponent(AS_EDITOR);const oc=card.dataset.origcat;if(oc)u+='&restore_cat='+encodeURIComponent(oc);}
+  const resp=await fetch(u);
   if(!resp.ok){alert('Undo failed — the story was not restored. Please try again.');return;}
-  card.classList.remove('done','approved','skipped','deferred','skip-pending');
+  card.classList.remove('done','approved','skipped','deferred','returned','skip-pending');
   card.querySelectorAll('button').forEach(b=>b.disabled=false);
   badge.innerHTML='';
   remaining++;
