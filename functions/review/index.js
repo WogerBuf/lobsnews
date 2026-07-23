@@ -61,7 +61,7 @@ export async function onRequestGet(context) {
       + '</div>';
     return '';
   }
-  const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Politics'];
+  const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Politics','General'];
   function catSelect(s, id) {
     const cur = s.category || '';
     const opts = CATS.slice();
