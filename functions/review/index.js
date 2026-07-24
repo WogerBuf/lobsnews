@@ -59,6 +59,14 @@ export async function onRequestGet(context) {
     if (s.editor_status === 'editor_skipped') return '<div class="ed-badge ed-skip">&#10007; ' + who + ' skipped' + note
       + '<button type="button" class="ed-accept" data-id="' + esc(s.id) + '" data-tok="' + esc(s.review_token) + '" data-who="' + who + '" data-note="' + esc(s.editor_note || '') + '" onclick="acceptEditorSkip(this)">&#10003; Accept editor’s choice</button>'
       + '</div>';
+    if (!s.editor_status && (s.review_reason || '').indexOf('Returned by ') === 0) {
+      const m = s.review_reason.match(/^Returned by ([^(]+) \(([^)]*) → ([^)]*)\)(?:: ([\s\S]*))?$/);
+      const rwho = m ? esc(m[1].trim()) : 'an editor';
+      const moved = (m && m[2] !== m[3]) ? ' &mdash; moved ' + esc(m[2]) + ' &rarr; ' + esc(m[3]) : '';
+      const rnote = (m && m[4]) ? '<span class="ed-note">&ldquo;' + esc(m[4].trim()) + '&rdquo;</span>'
+        : (s.editor_note ? '<span class="ed-note">&ldquo;' + esc(s.editor_note) + '&rdquo;</span>' : '');
+      return '<div class="ed-badge ed-ret">&#8617; Returned by ' + rwho + ' &mdash; your call' + moved + rnote + '</div>';
+    }
     return '';
   }
   const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Politics','General'];
@@ -88,7 +96,7 @@ export async function onRequestGet(context) {
       + '<div class="done-badge" id="b-' + id + '"></div>'
       + dupFlag
       + polFlag
-      + (!editorMode && s.editor_status ? editorBadge(s) : '')
+      + (!editorMode && (s.editor_status || (s.review_reason || '').indexOf('Returned by ') === 0) ? editorBadge(s) : '')
       + '<div class="cat">' + catSelect(s, id) + '</div>'
       + '<h2 class="hl"><a href="' + src + '" target="_blank" rel="noopener">' + esc(s.headline) + '</a></h2>'
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
@@ -284,6 +292,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .ed-sent{background:rgba(43,75,120,.10);color:var(--blue);}
 .ed-appr{background:var(--amber-soft);color:var(--amber);}
 .ed-skip{background:rgba(88,80,63,.10);color:var(--ink-soft);}
+.ed-ret{background:var(--amber-soft);color:var(--amber);}
 .ed-note{display:block;font-style:italic;font-weight:400;margin-top:3px;color:var(--ink-soft);}
 .ed-accept{display:inline-block;margin-top:7px;padding:4px 11px;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.4px;color:#fff;background:var(--ink-soft);border:none;border-radius:3px;cursor:pointer;}
 .ed-accept:hover{background:var(--ink);}
