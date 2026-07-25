@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Goodlede Feed — verified good news for your product</title>
+<meta name="description" content="License Goodlede's verified good-news stream: JSON API, embeddable widget, white-label RSS. Machine-screened, human-approved, no politics or hype."/>
+<link rel="icon" href="favicon.ico"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
+:root{--paper:#FBF8F1;--paper-2:#F3EEE3;--ink:#1C1810;--ink-soft:#58503F;--line:#E7DECE;--blue:#2B4B78;--blue-soft:rgba(43,75,120,.11);--amber:#8F6115;--amber-soft:rgba(143,97,21,.12);}
+html{overflow-x:hidden;}
+body{margin:0;font-family:'Newsreader',Georgia,serif;color:var(--ink);line-height:1.55;background:radial-gradient(120% 80% at 80% -10%,#FBF8F1 0%,rgba(251,248,241,0) 60%),var(--paper);padding:34px 22px 48px;overflow-x:clip;}
+.wrap{max-width:860px;margin:0 auto;}
+.mark{font-family:'Fraunces',serif;font-weight:600;font-size:32px;letter-spacing:-.5px;}
+.mark a{color:var(--ink);text-decoration:none;}
+.mark .lede{color:var(--amber);}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:38px;line-height:1.15;letter-spacing:-.5px;margin:34px 0 12px;}
+h2{font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin:44px 0 10px;}
+.lead{font-family:'Fraunces',serif;font-size:20px;line-height:1.45;max-width:720px;color:var(--ink);}
+p{max-width:720px;}
+.muted{color:var(--ink-soft);}
+.badgeline{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0;}
+.chip{font-size:13.5px;padding:5px 13px;border-radius:999px;border:1px solid var(--line);background:#FFFDF8;color:var(--ink-soft);}
+.demo{border:1px solid var(--line);border-radius:14px;background:#FFFDF8;padding:20px 22px;margin:16px 0 0;}
+.demo-cap{font-size:13px;color:var(--ink-soft);margin:0 0 12px;text-transform:uppercase;letter-spacing:.08em;}
+pre{background:#211D12;color:#EFE9DA;border-radius:10px;padding:16px 18px;font-size:13.5px;line-height:1.5;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+code.inline{background:var(--paper-2);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;}
+table{border-collapse:collapse;width:100%;max-width:720px;font-size:15px;margin:10px 0 0;}
+th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 12px 9px 0;vertical-align:top;}
+th{font-family:'Fraunces',serif;font-weight:500;}
+.price{font-weight:600;white-space:nowrap;}
+.formbox{border:1px solid var(--line);border-radius:14px;background:#FFFDF8;padding:20px 22px;margin:16px 0 0;max-width:560px;}
+.formbox label{display:block;font-size:14px;color:var(--ink-soft);margin:12px 0 4px;}
+.formbox input,.formbox textarea{width:100%;box-sizing:border-box;font-family:'Newsreader',serif;font-size:15px;padding:9px 13px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);}
+.formbox textarea{min-height:80px;resize:vertical;}
+.btn{margin-top:14px;font-family:'Newsreader',serif;font-size:15px;padding:9px 22px;border:1px solid var(--blue);color:#fff;background:var(--blue);border-radius:999px;cursor:pointer;}
+.btn:hover{opacity:.9;}
+.formmsg{font-size:14px;margin:10px 0 0;color:var(--amber);}
+footer.site{margin-top:56px;border-top:1px solid var(--line);padding-top:18px;font-size:14px;color:var(--ink-soft);}
+footer.site a{color:var(--ink-soft);}
+.sep{margin:0 7px;}
+@media(max-width:599px){h1{font-size:30px;}.lead{font-size:18px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mark"><a href="index.html">Good<span class="lede">lede</span></a></div>
+
+  <h1>Put verified good news in your product</h1>
+  <p class="lead">Goodlede publishes positive stories that are machine-screened and human-approved before they go live — a plain headline, the factual basis, a "Worth noting" caveat, and a source link. No politics, no fear, no hype. License the stream and drop it into your newsletter, app, intranet, or screens.</p>
+  <div class="badgeline">
+    <span class="chip">JSON API</span>
+    <span class="chip">Embeddable widget</span>
+    <span class="chip">Nine categories</span>
+    <span class="chip">Refreshed daily</span>
+    <span class="chip">Human-approved</span>
+  </div>
+
+  <h2>Live demo</h2>
+  <p class="muted">This is the widget, rendering the live feed. One script tag, no build step, themeable light or dark.</p>
+  <div class="demo">
+    <p class="demo-cap">Latest verified stories</p>
+    <script src="widget.js" data-key="70b45494da69fa764cc17db0fa49359f501985c747c691e1eb85cd3541822cb1" data-limit="3" async></script>
+  </div>
+
+  <h2>Quick start — widget</h2>
+<pre>&lt;script src="https://goodlede.com/widget.js"
+        data-key="YOUR_KEY"
+        data-limit="4"
+        data-category=""
+        data-theme="light"
+        async&gt;&lt;/script&gt;</pre>
+  <p class="muted"><code class="inline">data-category</code> filters to one category. <code class="inline">data-theme</code> is <code class="inline">light</code>, <code class="inline">dark</code>, or <code class="inline">auto</code>.</p>
+
+  <h2>Quick start — API</h2>
+<pre>curl "https://qvmewmebcrkmyutvbzxv.functions.supabase.co/goodlede-api?limit=5" \
+  -H "x-api-key: YOUR_KEY"</pre>
+<pre>{
+  "stories": [{
+    "id": "europeanrewildingnetworkexpandsincentraleurope",
+    "headline": "European Rewilding Network expands in Central Europe",
+    "basis": "Forever Forest Foundation (Poland) and Rewilding Rivers...",
+    "worth_noting": null,
+    "category": "Environment",
+    "significance": "Systemic / trend",
+    "verification": "Verified",
+    "source_name": "Rewilding Europe",
+    "source_url": "https://rewildingeurope.com/news/...",
+    "image": "https://...jpg",
+    "goodlede_url": "https://goodlede.com/story/european..."
+  }],
+  "meta": { "plan": "trial", "attribution_required": true }
+}</pre>
+
+  <table>
+    <tr><th>Parameter</th><th>What it does</th></tr>
+    <tr><td><code class="inline">key</code> / <code class="inline">x-api-key</code></td><td>Your API key (query param or header)</td></tr>
+    <tr><td><code class="inline">limit</code></td><td>1–50 stories, default 20</td></tr>
+    <tr><td><code class="inline">category</code></td><td>Environment, Animals, Kindness, Science, Health, Human Feats, Equality, Legal, David vs Goliath</td></tr>
+    <tr><td><code class="inline">since</code></td><td>ISO date — only stories first seen after it</td></tr>
+  </table>
+
+  <h2>Plans</h2>
+  <table>
+    <tr><th>Plan</th><th class="price">Price</th><th>Includes</th></tr>
+    <tr><td>Trial</td><td class="price">$0</td><td>Widget + API, attribution required, low limits, 30 days</td></tr>
+    <tr><td>Starter</td><td class="price">$39/mo</td><td>API + widget, attribution, standard limits</td></tr>
+    <tr><td>Pro</td><td class="price">$199/mo</td><td>White-label (no attribution), webhooks, higher limits, all categories</td></tr>
+    <tr><td>Enterprise</td><td class="price">Let's talk</td><td>SLA, custom curation, per-screen or per-seat licensing</td></tr>
+  </table>
+  <p class="muted">Licensed content is Goodlede-authored: our summaries, ratings, and caveats plus a link to the original source. We never republish source text.</p>
+
+  <h2>Request a trial key</h2>
+  <div class="formbox">
+    <label for="fEmail">Work email</label>
+    <input id="fEmail" type="email" placeholder="you@company.com"/>
+    <label for="fUse">Company and where the feed would live</label>
+    <textarea id="fUse" placeholder="e.g., Acme Wellness — daily positive story in our app's home screen"></textarea>
+    <button class="btn" id="fBtn" onclick="requestKey()">Request trial key</button>
+    <div class="formmsg" id="fMsg"></div>
+  </div>
+
+  <footer class="site">
+    <a href="index.html">Home</a><span class="sep">&middot;</span><a href="privacy.html">Privacy</a><span class="sep">&middot;</span><a href="tos.html">Terms</a><span class="sep">&middot;</span><a href="about.html">About</a><span class="sep">&middot;</span><a href="contact.html">Contact</a><span class="sep">&middot;</span><span>&copy; 2026 Wag Media, LLC</span>
+  </footer>
+</div>
+
+<script>
+const FUNCTIONS_BASE = "https://qvmewmebcrkmyutvbzxv.functions.supabase.co";
+async function requestKey(){
+  const email=(document.getElementById('fEmail').value||'').trim();
+  const use=(document.getElementById('fUse').value||'').trim();
+  const msg=document.getElementById('fMsg');
+  if(!email||!email.includes('@')){msg.textContent='Enter a work email.';return;}
+  if(!use){msg.textContent='Tell us where the feed would live.';return;}
+  document.getElementById('fBtn').disabled=true;
+  try{
+    const r=await fetch(FUNCTIONS_BASE+'/goodlede-contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,message:'[FEED TRIAL] '+use})});
+    if(r.ok){msg.textContent='Request received. We reply within one business day.';}
+    else{msg.textContent='Something went wrong — email us via the Contact page.';document.getElementById('fBtn').disabled=false;}
+  }catch(e){msg.textContent='Something went wrong — email us via the Contact page.';document.getElementById('fBtn').disabled=false;}
+}
+</script>
+</body>
+</html>

@@ -15,6 +15,7 @@ jobs:
         run: npx wrangler pages deploy . --project-name lobsnews --branch main --commit-dirty=true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 6316aa2f99fb9a6f19a3897f22b2189c
       - name: Smoke test — verify /approve function is live
         run: |
           sleep 10
