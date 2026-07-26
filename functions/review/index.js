@@ -413,8 +413,9 @@ async function act(id,token,action,skipReason,forceDrop){
     card.classList.add('done',outcome);
     const label=action==='hero'?'★ Hero':action==='approve'?(AS_EDITOR?'✓ Sent for sign-off':'✓ Approved'):action==='defer'?'↻ Back tomorrow':action==='return'?'↩ Sent to editor-in-chief':'✗ Skipped'+(skipReason?' — '+skipReason.replace(/-/g,' '):'');
     badge.innerHTML=label+'<button class="undo-btn" data-id="'+id+'" data-tok="'+token+'" onclick="undoAct(this.dataset.id,this.dataset.tok)">↩ Undo</button>';
-    remaining=Math.max(0,remaining-1);
-    updateCounter();
+    // After approving, keep Hero usable — it promotes the just-published story (backend v25 handles hero on approved).
+    if(action==='approve'&&!AS_EDITOR){const hb=card.querySelector('.btn-h');if(hb){hb.disabled=false;hb.innerHTML='&#9733; Make hero';}}
+    if(!card.dataset.acted){card.dataset.acted='1';remaining=Math.max(0,remaining-1);updateCounter();}
   }catch(e){card.querySelectorAll('button').forEach(b=>b.disabled=false);alert('Network error — story NOT updated. Check your connection and try again.');}
 }
 function acceptEditorSkip(btn){
@@ -441,6 +442,8 @@ async function undoAct(id,token){
   if(!resp.ok){alert('Undo failed — the story was not restored. Please try again.');return;}
   card.classList.remove('done','approved','skipped','deferred','returned','skip-pending');
   card.querySelectorAll('button').forEach(b=>b.disabled=false);
+  delete card.dataset.acted;
+  const hb=card.querySelector('.btn-h');if(hb)hb.innerHTML='&#9733; Hero';
   badge.innerHTML='';
   remaining++;
   updateCounter();
