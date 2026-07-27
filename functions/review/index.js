@@ -69,7 +69,7 @@ export async function onRequestGet(context) {
     }
     return '';
   }
-  const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Politics','General'];
+  const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Arts','Politics','General'];
   function catSelect(s, id) {
     const cur = s.category || '';
     const opts = CATS.slice();
