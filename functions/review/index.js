@@ -81,12 +81,26 @@ export async function onRequestGet(context) {
   function renderCard(s) {
     const isPol = (s.review_reason || '').toLowerCase().startsWith('political');
     const polFlag = isPol ? '<div class="pol-flag">&#9888; Political content &mdash; editorial approval sought</div>' : '';
-    const dupFlag = (s.dup_status === 'possible' && s.dup_of_headline)
-      ? '<div class="dup-flag"><span class="dup-lbl">&#9888; Possible duplicate</span> &mdash; looks like the same story as already published: &ldquo;'
-        + esc(s.dup_of_headline) + '&rdquo;'
-        + (s.dup_of_id ? ' &middot; <a href="https://goodlede.com/story/' + esc(s.dup_of_id) + '" target="_blank" rel="noopener">view the live one &#8599;</a>' : '')
-        + '</div>'
+    // Michael, 2026-09-09: "Show the duplicate warning for better_source stories too, and sort
+    // them up." Until now only dup_status 'possible' drew a warning. A 'better_source' story is
+    // ALSO a confirmed duplicate -- the checker found the same story already published and kept
+    // this one only because its outlet outranks the published one. With no warning on screen he
+    // approved a second copy of the Moderna/Merck melanoma trial on 8 Sept, three weeks after the
+    // CNN version went up. The system knew and did not say so.
+    const dupLive = s.dup_of_id
+      ? ' &middot; <a href="https://goodlede.com/story/' + esc(s.dup_of_id) + '" target="_blank" rel="noopener">view the live one &#8599;</a>'
       : '';
+    let dupFlag = '';
+    if (s.dup_status === 'possible' && s.dup_of_headline) {
+      dupFlag = '<div class="dup-flag"><span class="dup-lbl">&#9888; Possible duplicate</span> &mdash; looks like the same story as already published: &ldquo;'
+        + esc(s.dup_of_headline) + '&rdquo;' + dupLive + '</div>';
+    } else if (s.dup_status === 'better_source' && s.dup_of_headline) {
+      // Worded differently on purpose: this is not "might be a dupe", it is "same story, and this
+      // version is from a better outlet". The decision is replace-or-skip, not yes-or-no.
+      dupFlag = '<div class="dup-flag"><span class="dup-lbl">&#9888; Same story, better source</span> &mdash; already published as &ldquo;'
+        + esc(s.dup_of_headline) + '&rdquo;. Approving this adds a SECOND copy &mdash; replace the published one, or skip this.'
+        + dupLive + '</div>';
+    }
     const sig = s.significance ? '<span class="sig ' + sigCls(s.significance) + '">' + esc(s.significance) + '</span>' : '';
     const conf = s.confidence ? '<span class="conf"><span class="dot ' + dotCls(s.confidence) + '"></span>' + esc(s.confidence) + '</span>' : '';
     const id = esc(s.id);
@@ -152,9 +166,11 @@ export async function onRequestGet(context) {
 
   if (isAuthed && serverStories !== null) {
     sorted = [...serverStories].sort((a, b) => {
-      const ad = a.dup_status === 'possible' ? 1 : 0;
-      const bd = b.dup_status === 'possible' ? 1 : 0;
-      if (ad !== bd) return bd - ad; // possible-duplicates float to the top
+      // Both kinds of duplicate float to the top, so the decisions come before the routine ones.
+      const isDup = (x) => (x.dup_status === 'possible' || x.dup_status === 'better_source') ? 1 : 0;
+      const ad = isDup(a);
+      const bd = isDup(b);
+      if (ad !== bd) return bd - ad;
       const ap = (a.review_reason || '').toLowerCase().startsWith('political');
       const bp = (b.review_reason || '').toLowerCase().startsWith('political');
       return ap && !bp ? -1 : !ap && bp ? 1 : 0;
