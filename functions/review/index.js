@@ -106,7 +106,11 @@ export async function onRequestGet(context) {
     const id = esc(s.id);
     const tok = esc(s.review_token);
     const src = esc(s.source_url || '#');
-    return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '" data-origcat="' + esc(s.category || '') + '">'
+    // data-ed marks a story earmarked for a section editor (Rachel, Leeann). "Skip remaining"
+    // leaves these alone -- Michael, 2026-09-11: "clears the digest of all articles that have NOT
+    // been earmarked for another editor". assigned_editor is set for every editor state
+    // (with_editor, editor_approved, editor_skipped), so this spares anything they have a claim on.
+    return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '" data-ed="' + (s.assigned_editor ? '1' : '') + '" data-origcat="' + esc(s.category || '') + '">'
       + '<div class="done-badge" id="b-' + id + '"></div>'
       + dupFlag
       + polFlag
@@ -138,6 +142,11 @@ export async function onRequestGet(context) {
       + '<button class="btn-a" onclick="act(\'' + id + '\',\'' + tok + '\',\'approve\')">&#10003; Approve</button>'
       + (editorMode ? '<button class="btn-r" onclick="act(\'' + id + '\',\'' + tok + '\',\'return\')" title="Change the category above, then send this to the editor-in-chief’s next digest instead of publishing">&#8617; Recategorize &amp; send back</button>' : '')
       + (editorMode ? '' : '<button class="btn-h" onclick="act(\'' + id + '\',\'' + tok + '\',\'hero\')">&#9733; Hero</button>')
+      // Michael, 2026-09-11: "Add a 'skip now' button in the digest so it's quicker." Skipping was
+      // two clicks and a hunt -- open the reason panel, find "No reason" at the end of it. Most of
+      // his skips carry no reason anyway, so that path is now one click. Same call as the "No
+      // reason" button below; the reason panel stays for when he wants to record why.
+      + '<button class="btn-sn" title="Skip with no reason" onclick="act(\'' + id + '\',\'' + tok + '\',\'skip\',\'\')">&#10007; Skip now</button>'
       + '<button class="btn-s" onclick="pendSkip(\'' + id + '\')">&#10007; Skip &#9660;</button>'
       + '<button class="btn-l" onclick="act(\'' + id + '\',\'' + tok + '\',\'defer\',\'\')">&#8635; Later</button>'
       + '<a class="src" href="' + src + '" target="_blank" rel="noopener">' + esc(s.source_name || 'Source') + ' &#8599;</a>'
@@ -265,6 +274,11 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .btn-a:hover{background:#1e3557;}
 .btn-s{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:transparent;color:var(--amber);border:1px solid var(--amber);border-radius:4px;cursor:pointer;}
 .btn-s:hover{background:var(--amber);color:#F5F0E6;}
+/* Skip now sits next to Hero, which is solid amber. Tinted rather than solid so a publish action
+   and a reject action never look like the same button: Hero solid, Skip now tinted, Skip with a
+   reason plain outline. */
+.btn-sn{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber);border-radius:4px;cursor:pointer;font-weight:500;}
+.btn-sn:hover{background:var(--amber);color:#F5F0E6;}
 .card.skip-pending .btn-s{background:var(--amber);color:#F5F0E6;}
 .btn-l{font-family:'Newsreader',serif;font-size:15px;padding:8px 20px;background:transparent;color:var(--ink-soft);border:1px solid var(--line);border-radius:4px;cursor:pointer;}
 .btn-l:hover{background:var(--ink-soft);color:#F5F0E6;border-color:var(--ink-soft);}
@@ -280,6 +294,9 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 #bulk-bar .ba:hover{background:#1e3557;}
 #bulk-bar .bnd{background:transparent;color:var(--blue);border:1px dashed var(--blue);}
 #bulk-bar .bnd:hover{background:var(--blue);color:#F5F0E6;}
+#bulk-bar .bs{background:transparent;color:var(--amber);border:1px solid var(--amber);}
+#bulk-bar .bs:hover{background:var(--amber);color:#F5F0E6;}
+#bulk-bar .bulk-note{font-size:12px;color:var(--ink-faint);font-style:italic;}
 #bulk-bar button:disabled{opacity:.5;cursor:default;}
 .card.deferred .done-badge{display:flex;background:rgba(88,80,63,.10);color:var(--ink-soft);}
 .card.deferred{border-color:var(--ink-soft);}
@@ -330,7 +347,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 <div id="review-screen" class="wrap" style="${reviewScreenStyle}">
   ${editorBanner}
   <p class="status" id="status-msg">${esc(statusText)}</p>
-  ${initialCount > 0 && !editorMode ? '<div id="bulk-bar"><span class="bulk-lbl">All remaining:</span><button class="ba" onclick="bulkApprove(false)">&#10003; Approve all</button><button class="bnd" onclick="bulkApprove(true)">&#10003; Approve all &middot; no disclaimers</button></div>' : ''}
+  ${initialCount > 0 && !editorMode ? '<div id="bulk-bar"><span class="bulk-lbl">All remaining:</span><button class="ba" onclick="bulkApprove(false)">&#10003; Approve all</button><button class="bnd" onclick="bulkApprove(true)">&#10003; Approve all &middot; no disclaimers</button><button class="bs" onclick="bulkSkip()">&#10007; Skip remaining</button><span class="bulk-note" id="bulk-note"></span></div>' : ''}
   <div id="stories">${storiesHtml}</div>
 </div>
 <script>
@@ -343,6 +360,7 @@ function updateCounter(){
   const m=document.getElementById('status-msg');
   if(remaining>0){c.textContent=remaining+' remaining';m.textContent=remaining+' stories to review.';}
   else{c.textContent='All done ✓';m.textContent='All done. You can close this tab.';}
+  refreshBulkNote();
 }
 function pendSkip(id){
   const card=document.getElementById('c-'+id);
@@ -448,6 +466,26 @@ async function bulkApprove(dropCaveat){
   for(const c of cards){ await act(c.dataset.id,c.dataset.tok,'approve',null,dropCaveat); }
   if(bb)bb.querySelectorAll('button').forEach(b=>b.disabled=false);
 }
+// Michael, 2026-09-11: "Add a 'skip remaining' button up top that clears the digest of all
+// articles that have NOT been earmarked for another editor (i.e., Rachel or Leeann)." Anything
+// with an assigned editor is left exactly where it is -- their desk is not his to clear.
+function liveCards(){return [...document.querySelectorAll('#stories .card')].filter(c=>!c.classList.contains('done'));}
+function refreshBulkNote(){
+  const n=document.getElementById('bulk-note');if(!n)return;
+  const held=liveCards().filter(c=>c.dataset.ed==='1').length;
+  n.textContent=held?('Skip remaining leaves '+held+' with an editor'):'';
+}
+async function bulkSkip(){
+  const live=liveCards();
+  const cards=live.filter(c=>c.dataset.ed!=='1');
+  const spared=live.length-cards.length;
+  if(!cards.length){alert(spared?('Nothing to skip — the '+spared+' left '+(spared===1?'is':'are')+' with an editor.'):'Nothing left to skip.');return;}
+  if(!confirm('Skip all '+cards.length+' remaining '+(cards.length===1?'story':'stories')+'?'+(spared?(' '+spared+' with an editor '+(spared===1?'stays':'stay')+' put.'):'')+' Each one can still be undone.'))return;
+  const bb=document.getElementById('bulk-bar');if(bb)bb.querySelectorAll('button').forEach(b=>b.disabled=true);
+  for(const c of cards){ await act(c.dataset.id,c.dataset.tok,'skip',''); }
+  if(bb)bb.querySelectorAll('button').forEach(b=>b.disabled=false);
+  refreshBulkNote();
+}
 async function undoAct(id,token){
   const card=document.getElementById('c-'+id);
   const badge=document.getElementById('b-'+id);
@@ -470,6 +508,7 @@ async function unlock(){
   window.location='/review?t='+encodeURIComponent(t);
 }
 document.getElementById('tok-input')?.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+refreshBulkNote();
 </script>
 </body>
 </html>`;
