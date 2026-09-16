@@ -454,7 +454,6 @@ async function act(id,token,action,skipReason,forceDrop){
 }
 function acceptEditorSkip(btn){
   var id=btn.dataset.id, tok=btn.dataset.tok, who=btn.dataset.who||'the editor', note=(btn.dataset.note||'').trim();
-  if(!confirm('Honor '+who+'’s skip? This removes the story from your queue'+(note?' and records their reason.':'.')))return;
   var reason=note?(who+' skip: '+note):(who+' skip accepted');
   act(id,tok,'skip',reason);
 }
