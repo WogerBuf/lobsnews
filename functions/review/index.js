@@ -120,10 +120,10 @@ export async function onRequestGet(context) {
       + (s.basis ? '<p class="basis"><span class="lbl lbl-b">What backs it</span>' + esc(s.basis) + '</p>' : '')
       + (s.caveat
         ? '<div class="cav-block" id="cb-' + id + '">'
-          + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span>'
-          + '<span class="cav-tools"><button class="cav-e" onclick="editCav(\'' + id + '\')">&#9998; Edit</button>'
-          + '<button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></span></div>'
+          + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span></div>'
           + '<p class="caveat" id="cv-' + id + '">' + esc(s.caveat) + '</p>'
+          + '<div class="cav-tools"><button class="cav-e" onclick="editCav(\'' + id + '\')">&#9998; Edit</button>'
+          + '<button class="cav-x" id="cx-' + id + '" onclick="toggleCav(\'' + id + '\')">&#10007; Disapprove</button></div>'
           + '<div class="cav-edit" id="ce-' + id + '"><textarea class="cav-ta" id="ct-' + id + '">' + esc(s.caveat) + '</textarea>'
           + '<div class="cav-eb"><button class="cav-save" onclick="saveCav(\'' + id + '\')">Save edit</button><button class="cav-cancel" onclick="cancelCav(\'' + id + '\')">Cancel</button></div></div>'
           + '<div class="cav-why" id="cw-' + id + '"><span class="cav-why-lbl">Why? &mdash; optional, helps it learn</span><div class="cav-chips">'
@@ -131,9 +131,9 @@ export async function onRequestGet(context) {
           + '</div><input class="cav-reason" id="cwr-' + id + '" type="text" placeholder="…or type your reason"></div>'
           + '</div>'
         : '<div class="cav-block" id="cb-' + id + '">'
-          + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span>'
-          + '<span class="cav-tools"><button class="cav-e" onclick="addCav(\'' + id + '\')">&#9998; Add a note</button></span></div>'
+          + '<div class="cav-hd"><span class="lbl lbl-a">Worth noting</span></div>'
           + '<p class="caveat" id="cv-' + id + '" style="display:none;"></p>'
+          + '<div class="cav-tools"><button class="cav-e" onclick="addCav(\'' + id + '\')">&#9998; Add a note</button></div>'
           + '<div class="cav-edit" id="ce-' + id + '"><textarea class="cav-ta" id="ct-' + id + '" placeholder="Add a Worth noting note (optional)"></textarea>'
           + '<div class="cav-eb"><button class="cav-save" onclick="saveCav(\'' + id + '\')">Save</button><button class="cav-cancel" onclick="cancelAddCav(\'' + id + '\')">Cancel</button></div></div>'
           + '</div>')
@@ -242,8 +242,8 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .lbl{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:500;margin-bottom:2px;}
 .lbl-b{color:var(--blue);}.lbl-a{color:var(--amber);}
 .basis{font-size:13px;color:var(--ink);margin-bottom:10px;line-height:1.55;}
-.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}.cav-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}.cav-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--amber);cursor:pointer;user-select:none;}.cav-toggle input{accent-color:var(--amber);width:11px;height:11px;margin:0;vertical-align:middle;}.caveat.struck{opacity:.3;text-decoration:line-through;}.caveat.edited{color:var(--ink);font-style:normal;border-left-color:var(--blue);}
-.cav-tools{display:inline-flex;gap:6px;flex-shrink:0;}
+.caveat{font-size:12.5px;color:var(--ink-soft);font-style:italic;border-left:2px solid var(--line);padding-left:9px;margin-bottom:10px;line-height:1.5;}.cav-hd{margin-bottom:2px;}.cav-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--amber);cursor:pointer;user-select:none;}.cav-toggle input{accent-color:var(--amber);width:11px;height:11px;margin:0;vertical-align:middle;}.caveat.struck{opacity:.3;text-decoration:line-through;}.caveat.edited{color:var(--ink);font-style:normal;border-left-color:var(--blue);}
+.cav-tools{display:flex;gap:6px;flex-shrink:0;justify-content:flex-end;margin:-4px 0 10px;}
 .cav-e,.cav-x{font-family:'Newsreader',serif;font-size:11px;padding:2px 9px;background:transparent;border-radius:3px;cursor:pointer;white-space:nowrap;}
 .cav-e{color:var(--blue);border:1px solid var(--blue);}.cav-e:hover{background:var(--blue);color:#F5F0E6;}
 .cav-x{color:var(--amber);border:1px solid var(--amber);}.cav-x:hover{background:var(--amber);color:#F5F0E6;}
