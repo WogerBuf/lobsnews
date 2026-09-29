@@ -4,6 +4,9 @@ export async function onRequestGet(context) {
 
   const url = new URL(context.request.url);
   const urlToken = url.searchParams.get('t');
+  // ?screened=1 lists the stories the digest held back as brief misses; they are still pending.
+  const screenedMode = url.searchParams.get('screened') === '1';
+  let screenedCount = 0;
 
   // No secret in source: validate whatever token is in the URL against the server (admin first, then editor).
   let serverStories = null;
@@ -15,10 +18,10 @@ export async function onRequestGet(context) {
       const r = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: urlToken, action: 'pending' })
+        body: JSON.stringify({ token: urlToken, action: 'pending', screened: screenedMode })
       });
       const d = await r.json();
-      if (d.ok) { isAdmin = true; serverStories = d.stories || []; }
+      if (d.ok) { isAdmin = true; serverStories = d.stories || []; screenedCount = d.screened_count || 0; }
     } catch (_) {}
     if (!isAdmin) {
       try {
@@ -69,6 +72,12 @@ export async function onRequestGet(context) {
     }
     return '';
   }
+  const SCREEN_LABELS = { not_happened: 'hasn’t happened yet', industry: 'industry news', politics: 'politics or court procedure', old_research: 'old research written up again' };
+  function screenFlag(s) {
+    if (!s.screened_at) return '';
+    const why = s.brief_reason ? ' &mdash; ' + esc(s.brief_reason) : '';
+    return '<div class="scr-flag"><span class="scr-lbl">Held back from your digest</span>: ' + esc(SCREEN_LABELS[s.brief_verdict] || 'off-brief') + why + '</div>';
+  }
   const CATS = ['Environment','Animals','Kindness','Science','Health','Human Feats','Equality','Legal','David vs Goliath','Arts','Politics','General'];
   function catSelect(s, id) {
     const cur = s.category || '';
@@ -112,6 +121,7 @@ export async function onRequestGet(context) {
     // (with_editor, editor_approved, editor_skipped), so this spares anything they have a claim on.
     return '<div class="card' + (isPol ? ' political' : '') + '" id="c-' + id + '" data-id="' + id + '" data-tok="' + tok + '" data-ed="' + (s.assigned_editor ? '1' : '') + '" data-origcat="' + esc(s.category || '') + '">'
       + '<div class="done-badge" id="b-' + id + '"></div>'
+      + screenFlag(s)
       + dupFlag
       + polFlag
       + (!editorMode && (s.editor_status || (s.review_reason || '').indexOf('Returned by ') === 0) ? editorBadge(s) : '')
@@ -185,13 +195,20 @@ export async function onRequestGet(context) {
       return ap && !bp ? -1 : !ap && bp ? 1 : 0;
     });
     if (sorted.length === 0) {
-      statusText = 'No stories pending review right now.';
+      statusText = screenedMode ? 'Nothing is held back right now.' : 'No stories pending review right now.';
     } else {
       storiesHtml = sorted.map(renderCard).join('');
       counterText = sorted.length + ' remaining';
-      statusText = sorted.length + ' stories to review.';
+      statusText = screenedMode
+        ? sorted.length + ' held back from your digest as clear misses of the brief. They are still pending: approve any you want.'
+        : sorted.length + ' stories to review.';
     }
   }
+  const tokQ = isAdmin ? '?t=' + encodeURIComponent(urlToken) : '';
+  const screenLinkHtml = !isAdmin ? ''
+    : screenedMode ? '<p class="scr-link"><a href="/review' + tokQ + '">&larr; Back to your review page</a></p>'
+    : screenedCount > 0 ? '<p class="scr-link"><a href="/review' + tokQ + '&screened=1">' + screenedCount + ' held back as off-brief &#8599;</a> &mdash; still pending, not rejected</p>'
+    : '';
 
   const reviewScreenStyle = isAuthed ? '' : 'display:none;';
   const gateScreenStyle = isAuthed ? 'display:none;' : '';
@@ -231,6 +248,10 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 .pol-flag{background:#FFF3CD;border:1px solid #FFCC00;border-radius:3px;padding:6px 10px;margin-bottom:10px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#856404;}
 .dup-flag{background:#FBE9E7;border:1px solid #E0A89B;border-radius:3px;padding:7px 11px;margin-bottom:10px;font-size:12px;color:#8A3324;line-height:1.45;}
 .dup-flag .dup-lbl{font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:10.5px;}
+.scr-flag{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:7px 11px;margin-bottom:10px;font-size:12px;color:var(--ink-soft);line-height:1.45;}
+.scr-flag .scr-lbl{font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:10.5px;color:var(--amber);}
+.scr-link{font-size:14px;color:var(--ink-soft);margin:-8px 0 18px;}
+.scr-link a{color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue);}
 .dup-flag a{color:#2B4B78;text-decoration:underline;}
 .cat{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:7px;}
 .cat-sel{font-family:'Newsreader',serif;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;background:#FDFAF5;border:1px solid var(--line);border-radius:3px;padding:2px 6px;cursor:pointer;max-width:100%;}
@@ -347,6 +368,7 @@ html,body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Geor
 <div id="review-screen" class="wrap" style="${reviewScreenStyle}">
   ${editorBanner}
   <p class="status" id="status-msg">${esc(statusText)}</p>
+  ${screenLinkHtml}
   ${initialCount > 0 && !editorMode ? '<div id="bulk-bar"><span class="bulk-lbl">All remaining:</span><button class="ba" onclick="bulkApprove(false)">&#10003; Approve all</button><button class="bnd" onclick="bulkApprove(true)">&#10003; Approve all &middot; no disclaimers</button><button class="bs" onclick="bulkSkip()">&#10007; Skip remaining</button><span class="bulk-note" id="bulk-note"></span></div>' : ''}
   <div id="stories">${storiesHtml}</div>
 </div>
